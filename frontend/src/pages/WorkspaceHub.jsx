@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import mammoth from "mammoth";
-import Navbar from "../components/Navbar";
+import Topbar from "../components/Topbar";
 import Sidebar from "../components/Sidebar";
 import MetricCard from "../components/MetricCard";
 import AIStatus from "../components/AIStatus";
@@ -87,7 +87,7 @@ const AGENTS_LIST = [
     id: "coord-agent",
     name: "Coordinator Agent",
     role: "Orchestration & Workflow Management",
-    model: "meta/llama-3.1-70b-instruct",
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
     status: "Active",
     tasksCompleted: 142,
     accuracy: "99.2%",
@@ -96,7 +96,7 @@ const AGENTS_LIST = [
     id: "req-agent",
     name: "Requirement Analysis Agent",
     role: "BRD / Jira parsing and semantic classification",
-    model: "meta/llama-3.1-70b-instruct",
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
     status: "Active",
     tasksCompleted: 98,
     accuracy: "97.8%",
@@ -105,7 +105,7 @@ const AGENTS_LIST = [
     id: "impact-agent",
     name: "Code Impact Agent",
     role: "AST parsing, dependency mapping, change tracing",
-    model: "meta/llama-3.1-70b-instruct",
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
     status: "Active",
     tasksCompleted: 85,
     accuracy: "96.4%",
@@ -114,7 +114,7 @@ const AGENTS_LIST = [
     id: "review-agent",
     name: "Senior Pre-Review Agent",
     role: "Automated code inspection, linting, regression risk",
-    model: "meta/llama-3.1-70b-instruct",
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
     status: "Active",
     tasksCompleted: 110,
     accuracy: "98.1%",
@@ -123,7 +123,7 @@ const AGENTS_LIST = [
     id: "pr-agent",
     name: "PR Generator Agent",
     role: "Automated PR drafting and release documentation",
-    model: "meta/llama-3.1-70b-instruct",
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
     status: "Active",
     tasksCompleted: 76,
     accuracy: "99.0%",
@@ -224,7 +224,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
   const docInputRef = useRef(null);
 
   // Settings states
-  const [aiModel, setAiModel] = useState("meta/llama-3.1-70b-instruct");
+  const [aiModel, setAiModel] = useState("nvidia/llama-3.1-nemotron-70b-instruct");
   const [githubUsername, setGithubUsername] = useState("");
   const [jiraUsername, setJiraUsername] = useState("");
   const [settingsSaved, setSettingsSaved] = useState(false);
@@ -616,7 +616,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
   return (
     <>
-      <Navbar />
+      <Topbar />
 
       <div className="dashboard-shell" style={{ display: "flex", background: "transparent" }}>
         <Sidebar />
@@ -1719,10 +1719,10 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                     <div>
                       <label style={LABEL_STYLE}>Active Model Engine</label>
                       <select value={aiModel} onChange={(e) => setAiModel(e.target.value)} style={INPUT_STYLE}>
-                        <option value="meta/llama-3.1-70b-instruct">Gemini 3.6 Flash (Default - Ultra fast & State-of-the-art)</option>
+                        <option value="nvidia/llama-3.1-nemotron-70b-instruct">Gemini 3.6 Flash (Default - Ultra fast & State-of-the-art)</option>
                         <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
                         <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep AST analysis)</option>
-                        <option value="meta/llama-3.1-70b-instruct">Gemini 1.5 Flash</option>
+                        <option value="nvidia/llama-3.1-nemotron-70b-instruct">Gemini 1.5 Flash</option>
                       </select>
                     </div>
                   </div>
@@ -1911,3 +1911,4 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 };
 
 export default WorkspaceHub;
+
