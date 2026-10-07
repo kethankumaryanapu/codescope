@@ -24,7 +24,7 @@ const callPythonAgent = async (endpoint, data) => {
 
 const getAiClient = () => {
   const apiKey = process.env.NVIDIA_API_KEY;
-  if (!apiKey || apiKey === 'your_nvidia_api_key_here' || apiKey.trim() === '') {
+  if (!apiKey || apiKey.trim() === '' || apiKey === 'your_nvidia_api_key_here') {
     return null;
   }
   try {
