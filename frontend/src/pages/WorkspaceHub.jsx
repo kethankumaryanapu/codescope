@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+﻿import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import mammoth from "mammoth";
 import Topbar from "../components/Topbar";
@@ -6,10 +6,13 @@ import Sidebar from "../components/Sidebar";
 import MetricCard from "../components/MetricCard";
 import AIStatus from "../components/AIStatus";
 import DependencyGraph from "../components/DependencyGraph";
-import ImpactTable from "../components/ImpactTable";
+import ImpactFileList from "../components/ImpactFileList";
 import MarkdownView from "../components/MarkdownView";
 import Loader from "../components/Loader";
 import ReviewCard from "../components/ReviewCard";
+import IntelligenceCore from "../components/IntelligenceCore";
+import AgentCard from "../components/AgentCard";
+import PipelineStatus from "../components/PipelineStatus";
 import { useAnalysis } from "../context/AnalysisContext";
 import {
   Sparkles,
@@ -134,17 +137,17 @@ const AGENTS_LIST = [
 const INPUT_STYLE = {
   width: "100%",
   padding: "12px 16px",
-  background: "#1F2937",
+  background: "var(--surface-2)",
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: "10px",
-  color: "white",
+  color: "var(--text)",
   fontSize: "14px",
   outline: "none",
 };
 
 const LABEL_STYLE = {
   display: "block",
-  color: "#D1D5DB",
+  color: "var(--text-2)",
   marginBottom: "8px",
   fontSize: "14px",
   fontWeight: 500,
@@ -152,7 +155,7 @@ const LABEL_STYLE = {
 
 const HINT_STYLE = {
   fontSize: "12px",
-  color: "#6B7280",
+  color: "var(--text-3)",
   marginTop: "5px",
 };
 
@@ -621,19 +624,19 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
       <div className="dashboard-shell" style={{ display: "flex", background: "transparent" }}>
         <Sidebar />
 
-        <div className="dashboard-main" style={{ flex: 1, padding: "28px", minWidth: 0 }}>
+        <div className="dashboard-main" style={{ flex: 1, padding: "20px", minWidth: 0 }}>
           {/* Header Banner */}
-          <div className="hero-panel" style={{ marginBottom: "22px", borderRadius: "20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
+          <div className="hero-panel" style={{ marginBottom: "20px", borderRadius: "var(--radius-lg)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", flexWrap: "wrap" }}>
               <div style={{ maxWidth: "760px" }}>
                 <div className="stat-chip" style={{ marginBottom: "12px", borderRadius: "999px" }}>
                   <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: isLiveSyncing ? "#F59E0B" : "#22C55E", display: "inline-block" }} />
                   {isLiveSyncing ? "Syncing live data…" : `Live connection active • Refreshed ${lastUpdated || "just now"}`}
                 </div>
-                <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "6px", color: "#FFFFFF", textShadow: "0 2px 10px rgba(0,0,0,0.2)" }}>
+                <h1 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "6px", color: "var(--text)", textShadow: "0 2px 10px rgba(0,0,0,0.2)" }}>
                   AI Workspace Hub
                 </h1>
-                <p style={{ color: "#94A3B8", fontSize: "14px", lineHeight: "1.6", margin: 0 }}>
+                <p style={{ color: "var(--text-3)", fontSize: "14px", lineHeight: "1.6", margin: 0 }}>
                   Consolidated dashboard orchestrating semantic codebase indexing, requirement mapping, and Senior Staff AI pre-reviews.
                 </p>
               </div>
@@ -648,10 +651,10 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   }}
                   style={{
                     padding: "8px 14px",
-                    background: "rgba(15, 23, 42, 0.9)",
+                    background: "var(--surface-2)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "12px",
-                    color: "#FFFFFF",
+                    color: "var(--text)",
                     fontSize: "13px",
                     fontWeight: 600,
                     cursor: "pointer",
@@ -670,7 +673,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
           {/* Quick Metrics Bar (Shown on Overview & Analytics) */}
           {(activeTab === "overview" || activeTab === "analytics") && (
-            <div className="metric-grid" style={{ marginBottom: "22px" }}>
+            <div className="metric-grid" style={{ marginBottom: "20px" }}>
               <MetricCard
                 title="Connected Repos"
                 value={liveConnectedRepos.toString()}
@@ -683,7 +686,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                 title="Indexed Stories"
                 value={liveRequirements.toString()}
                 subtitle="Requirements parsed"
-                color="#4F46E5"
+                color="var(--surface-3)"
                 to="/requirements"
                 tooltip="Click to configure and analyze requirement stories"
               />
@@ -717,14 +720,14 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                 <div className="card" style={{ padding: "24px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <FileText size={18} color="#818CF8" />
+                      <FileText size={18} color="var(--nvidia)" />
                       <h2 style={{ margin: 0, fontSize: "17px", fontWeight: 600 }}>Active Requirement Target</h2>
                     </div>
-                    <span style={{ background: "rgba(79, 70, 229, 0.15)", color: "#818CF8", padding: "4px 10px", borderRadius: "10px", fontSize: "12px", fontWeight: 600 }}>
+                    <span style={{ background: "rgba(118,185,0,0.12)", color: "var(--nvidia)", padding: "4px 10px", borderRadius: "10px", fontSize: "12px", fontWeight: 600 }}>
                       {requirementId}
                     </span>
                   </div>
-                  <p style={{ color: "#CBD5E1", fontSize: "14px", lineHeight: "1.6", margin: "0 0 16px" }}>
+                  <p style={{ color: "var(--text-2)", fontSize: "14px", lineHeight: "1.6", margin: "0 0 16px" }}>
                     {brdText.substring(0, 180)}...
                   </p>
                   <div style={{ display: "flex", gap: "10px" }}>
@@ -756,14 +759,14 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                     </div>
                     <button
                       onClick={() => navigate("/files")}
-                      style={{ background: "transparent", border: "none", color: "#818CF8", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}
+                      style={{ background: "transparent", border: "none", color: "var(--nvidia)", fontSize: "13px", cursor: "pointer", fontWeight: 500 }}
                     >
                       Manage files ({totalTrackedFiles})
                     </button>
                   </div>
                   <div style={{ background: "rgba(255,255,255,0.03)", padding: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)", marginBottom: "14px" }}>
-                    <p style={{ color: "#E2E8F0", fontSize: "14px", margin: "0 0 6px" }}>{selectedRepo?.name}</p>
-                    <small style={{ color: "#94A3B8" }}>Branch: <strong>{selectedRepo?.branch}</strong> • Status: <span style={{ color: "#22C55E" }}>Active</span></small>
+                    <p style={{ color: "var(--text)", fontSize: "14px", margin: "0 0 6px" }}>{selectedRepo?.name}</p>
+                    <small style={{ color: "var(--text-3)" }}>Branch: <strong>{selectedRepo?.branch}</strong> • Status: <span style={{ color: "#22C55E" }}>Active</span></small>
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button
@@ -784,7 +787,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
-                        <tr style={{ color: "#94A3B8", fontSize: "12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                        <tr style={{ color: "var(--text-3)", fontSize: "12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                           <th align="left" style={{ paddingBottom: "10px" }}>Story / Title</th>
                           <th align="left" style={{ paddingBottom: "10px" }}>Status</th>
                           <th align="left" style={{ paddingBottom: "10px" }}>Confidence</th>
@@ -795,17 +798,17 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                         {history.slice(0, 3).map((item) => (
                           <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "13.5px" }}>
                             <td style={{ padding: "12px 0" }}>
-                              <div style={{ fontWeight: 600, color: "#F1F5F9" }}>{item.requirementId}</div>
-                              <div style={{ fontSize: "11px", color: "#94A3B8" }}>{item.title}</div>
+                              <div style={{ fontWeight: 600, color: "var(--text)" }}>{item.requirementId}</div>
+                              <div style={{ fontSize: "11px", color: "var(--text-3)" }}>{item.title}</div>
                             </td>
                             <td>
                               <span style={{ color: "#22C55E", fontWeight: 600 }}>● {item.status}</span>
                             </td>
-                            <td style={{ color: "#818CF8", fontWeight: 600 }}>{item.confidence}</td>
+                            <td style={{ color: "var(--nvidia)", fontWeight: 600 }}>{item.confidence}</td>
                             <td align="right">
                               <button
                                 onClick={() => navigate("/impact-analysis")}
-                                style={{ background: "transparent", border: "none", color: "#818CF8", cursor: "pointer", fontSize: "12.5px" }}
+                                style={{ background: "transparent", border: "none", color: "var(--nvidia)", cursor: "pointer", fontSize: "12.5px" }}
                               >
                                 View Map →
                               </button>
@@ -820,9 +823,12 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
               {/* Right Column (Agent Monitor) */}
               <div>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 20px 0' }}>
+                  <IntelligenceCore size={320} />
+                </div>
                 <AIStatus />
-                <div className="card" style={{ marginTop: "20px", padding: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <button onClick={() => navigate("/code-review")} className="primary-btn" style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", background: "rgba(79, 70, 229, 0.15)", border: "1px solid rgba(129, 140, 248, 0.3)", color: "#818CF8" }}>
+                <div className="card" style={{ marginTop: "var(--radius-lg)", padding: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <button onClick={() => navigate("/code-review")} className="primary-btn" style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", background: "rgba(118,185,0,0.12)", border: "1px solid rgba(118,185,0,0.3)", color: "var(--nvidia)" }}>
                     <ShieldCheck size={16} /> AI Code Pre-Review
                   </button>
                   <button onClick={() => navigate("/pr-generator")} className="primary-btn" style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", background: "#059669" }}>
@@ -840,8 +846,8 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                 <div>
-                  <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>Codebase Indexer Registry</h2>
-                  <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Manage files target for requirement analysis scanning and AST dependency graph building.</p>
+                  <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>Codebase Indexer Registry</h2>
+                  <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Manage files target for requirement analysis scanning and AST dependency graph building.</p>
                 </div>
                 <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                   <button onClick={handleSyncRepo} disabled={syncing} className="secondary-btn" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px" }}>
@@ -887,15 +893,15 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               )}
 
               {/* Filter controls */}
-              <div className="card" style={{ padding: "16px", display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
+              <div className="card" style={{ padding: "10px", display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
                 <div style={{ flex: 1, minWidth: "220px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", display: "flex", alignItems: "center", padding: "8px 12px", gap: "8px" }}>
-                  <Search size={15} color="#94A3B8" />
+                  <Search size={15} color="var(--text-3)" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search file registry..."
-                    style={{ background: "transparent", border: "none", outline: "none", color: "white", width: "100%", fontSize: "13.5px" }}
+                    style={{ background: "transparent", border: "none", outline: "none", color: "var(--text)", width: "100%", fontSize: "13.5px" }}
                   />
                 </div>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -907,9 +913,9 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                         padding: "6px 12px",
                         fontSize: "12.5px",
                         borderRadius: "8px",
-                        background: activeModuleFilter === mod ? "#4F46E5" : "rgba(255,255,255,0.05)",
+                        background: activeModuleFilter === mod ? "var(--surface-3)" : "rgba(255,255,255,0.05)",
                         border: "1px solid rgba(255,255,255,0.08)",
-                        color: activeModuleFilter === mod ? "white" : "#94A3B8",
+                        color: activeModuleFilter === mod ? "var(--text)" : "var(--text-3)",
                         cursor: "pointer",
                       }}
                     >
@@ -926,12 +932,12 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   {isLoadingFiles ? (
                     <Loader text="Loading codebase file registry..." />
                   ) : filteredFiles.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "48px 20px", color: "#94A3B8" }}>
-                      <FolderTree size={44} style={{ marginBottom: "12px", opacity: 0.4, color: "#818CF8" }} />
-                      <h3 style={{ fontSize: "16px", color: "#F1F5F9", margin: "0 0 6px" }}>
+                    <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--text-3)" }}>
+                      <FolderTree size={44} style={{ marginBottom: "12px", opacity: 0.4, color: "var(--nvidia)" }} />
+                      <h3 style={{ fontSize: "14px", color: "var(--text)", margin: "0 0 6px" }}>
                         {repoFiles.length === 0 ? "Registry is Completely Clear" : "No files matching search"}
                       </h3>
-                      <p style={{ fontSize: "13px", maxWidth: "440px", margin: "0 auto 20px", color: "#94A3B8" }}>
+                      <p style={{ fontSize: "13px", maxWidth: "440px", margin: "0 auto 20px", color: "var(--text-3)" }}>
                         {repoFiles.length === 0
                           ? "All old files have been deleted. You can now upload your fresh project files or paste code snippets."
                           : "Try clearing your search query or switching module filters."}
@@ -954,7 +960,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   ) : (
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
-                        <tr style={{ color: "#94A3B8", fontSize: "12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                        <tr style={{ color: "var(--text-3)", fontSize: "12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                           <th align="left" style={{ paddingBottom: "10px" }}>File Path</th>
                           <th align="left" style={{ paddingBottom: "10px" }}>Module</th>
                           <th align="left" style={{ paddingBottom: "10px" }}>Lines</th>
@@ -964,18 +970,18 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                       <tbody>
                         {filteredFiles.map((file) => (
                           <tr key={file.id || file.filePath} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "13px" }}>
-                            <td style={{ padding: "12px 0", fontFamily: "monospace", color: "#E2E8F0" }}>{file.filePath}</td>
+                            <td style={{ padding: "12px 0", fontFamily: "monospace", color: "var(--text)" }}>{file.filePath}</td>
                             <td>
-                              <span style={{ fontSize: "11px", background: "rgba(255,255,255,0.07)", padding: "3px 8px", borderRadius: "6px", color: "#CBD5E1" }}>
+                              <span style={{ fontSize: "11px", background: "rgba(255,255,255,0.07)", padding: "3px 8px", borderRadius: "6px", color: "var(--text-2)" }}>
                                 {file.module}
                               </span>
                             </td>
-                            <td style={{ color: "#94A3B8" }}>{file.lineCount || 0}</td>
+                            <td style={{ color: "var(--text-3)" }}>{file.lineCount || 0}</td>
                             <td align="right">
                               <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
                                 <button
                                   onClick={() => setViewingFile(file)}
-                                  style={{ background: "transparent", border: "none", color: "#818CF8", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
+                                  style={{ background: "transparent", border: "none", color: "var(--nvidia)", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
                                 >
                                   <Eye size={13} /> View
                                 </button>
@@ -1002,26 +1008,26 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                         <h3 style={{ fontSize: "15px", margin: 0, fontFamily: "monospace", color: "#F8FAFC" }}>
                           {viewingFile.filePath.split("/").pop()}
                         </h3>
-                        <small style={{ color: "#94A3B8", fontFamily: "monospace" }}>{viewingFile.filePath}</small>
+                        <small style={{ color: "var(--text-3)", fontFamily: "monospace" }}>{viewingFile.filePath}</small>
                       </div>
                       <div style={{ display: "flex", gap: "6px" }}>
                         <button
                           onClick={() => handleCopyPath(viewingFile.filePath)}
-                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", padding: "4px 8px", fontSize: "11px", color: "white", cursor: "pointer" }}
+                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", padding: "4px 8px", fontSize: "11px", color: "var(--text)", cursor: "pointer" }}
                         >
                           {copiedPath === viewingFile.filePath ? "Copied!" : "Copy Path"}
                         </button>
                         <button
                           onClick={() => setViewingFile(null)}
-                          style={{ background: "transparent", border: "none", color: "#94A3B8", cursor: "pointer" }}
+                          style={{ background: "transparent", border: "none", color: "var(--text-3)", cursor: "pointer" }}
                         >
                           <X size={16} />
                         </button>
                       </div>
                     </div>
 
-                    <div style={{ flex: 1, overflow: "auto", background: "#0b1329", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "14px" }}>
-                      <pre style={{ margin: 0, fontFamily: "monospace", fontSize: "12.5px", color: "#C7D2FE", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
+                    <div style={{ flex: 1, overflow: "auto", background: "var(--surface)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "14px" }}>
+                      <pre style={{ margin: 0, fontFamily: "monospace", fontSize: "12.5px", color: "var(--text-2)", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
                         {viewingFile.content || "// No code content uploaded for this indexed reference."}
                       </pre>
                     </div>
@@ -1041,21 +1047,21 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                 {/* Active Files Context Indicator */}
                 <div className="card" style={{ padding: "16px 20px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <span style={{ fontSize: "12.5px", color: "#94A3B8", display: "flex", alignItems: "center", gap: "6px" }}>
-                      <FolderTree size={14} color="#818CF8" /> Target Codebase Files Context (First 5):
+                    <span style={{ fontSize: "12.5px", color: "var(--text-3)", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <FolderTree size={14} color="var(--nvidia)" /> Target Codebase Files Context (First 5):
                     </span>
-                    <button onClick={() => navigate("/files")} style={{ background: "transparent", border: "none", color: "#818CF8", fontSize: "12px", cursor: "pointer" }}>
+                    <button onClick={() => navigate("/files")} style={{ background: "transparent", border: "none", color: "var(--nvidia)", fontSize: "12px", cursor: "pointer" }}>
                       Manage files
                     </button>
                   </div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                     {repoFiles.slice(0, 5).map((f, i) => (
-                      <code key={i} style={{ background: "#1F2937", color: "#C7D2FE", padding: "4px 8px", borderRadius: "6px", fontSize: "11px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      <code key={i} style={{ background: "var(--surface-2)", color: "var(--text-2)", padding: "4px 8px", borderRadius: "6px", fontSize: "11px", border: "1px solid rgba(255,255,255,0.05)" }}>
                         {f.filePath || f.rootPath}
                       </code>
                     ))}
                     {repoFiles.length > 5 && (
-                      <span style={{ color: "#94A3B8", fontSize: "11.5px", alignSelf: "center" }}>
+                      <span style={{ color: "var(--text-3)", fontSize: "11.5px", alignSelf: "center" }}>
                         +{repoFiles.length - 5} more files indexed
                       </span>
                     )}
@@ -1064,7 +1070,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
                 {/* Preset List */}
                 <div className="card" style={{ padding: "20px" }}>
-                  <h3 style={{ fontSize: "14.5px", margin: "0 0 10px", color: "#E2E8F0" }}>💡 Load Preset Requirement Story:</h3>
+                  <h3 style={{ fontSize: "14.5px", margin: "0 0 10px", color: "var(--text)" }}>💡 Load Preset Requirement Story:</h3>
                   <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                     {REQUIREMENT_PRESETS.map((p) => (
                       <button
@@ -1073,8 +1079,8 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                         style={{
                           padding: "8px 12px",
                           borderRadius: "8px",
-                          background: requirementId === p.id ? "#4F46E5" : "#1F2937",
-                          color: requirementId === p.id ? "#FFFFFF" : "#9CA3AF",
+                          background: requirementId === p.id ? "var(--surface-3)" : "var(--surface-2)",
+                          color: requirementId === p.id ? "var(--text)" : "var(--text-3)",
                           border: "1px solid rgba(255,255,255,0.08)",
                           cursor: "pointer",
                           fontSize: "12.5px",
@@ -1089,16 +1095,16 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
                 {/* Form specifications */}
                 <div className="card" style={{ padding: "24px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "10px" }}>
                     <div>
                       <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 600 }}>Requirement Specifications</h2>
-                      <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>
+                      <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>
                         Paste requirement text or upload a <strong>.docx / .doc Word document</strong> or BRD file.
                       </p>
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <label style={{ fontSize: "12.5px", color: "#94A3B8", fontWeight: "600" }}>Story ID:</label>
+                      <label style={{ fontSize: "12.5px", color: "var(--text-3)", fontWeight: "600" }}>Story ID:</label>
                       <input
                         type="text"
                         value={requirementId}
@@ -1106,9 +1112,9 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                         placeholder="e.g. JIRA-241"
                         style={{
                           padding: "6px 12px",
-                          background: "#1F2937",
+                          background: "var(--surface-2)",
                           border: "1px solid rgba(255,255,255,0.1)",
-                          color: "white",
+                          color: "var(--text)",
                           borderRadius: "8px",
                           fontWeight: "bold",
                           width: "130px",
@@ -1135,12 +1141,12 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                       style={{
                         padding: "14px 18px",
                         borderRadius: "14px",
-                        background: "rgba(99, 102, 241, 0.12)",
-                        border: "1px solid rgba(129, 140, 248, 0.35)",
+                        background: "rgba(118,185,0,0.08)",
+                        border: "1px solid rgba(118,185,0,0.35)",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: "16px",
+                        marginBottom: "10px",
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -1153,7 +1159,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#818CF8",
+                            color: "var(--nvidia)",
                           }}
                         >
                           <FileCheck size={20} />
@@ -1165,7 +1171,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                               Extracted Successfully
                             </span>
                           </div>
-                          <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#94A3B8" }}>
+                          <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--text-3)" }}>
                             Size: <strong>{uploadedDocInfo.size}</strong> • Text: <strong>{uploadedDocInfo.chars.toLocaleString()} chars</strong> (~{uploadedDocInfo.lines} lines)
                           </p>
                         </div>
@@ -1214,13 +1220,13 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                       style={{
                         padding: "20px",
                         borderRadius: "14px",
-                        background: dragOverDoc ? "rgba(99, 102, 241, 0.18)" : "rgba(255, 255, 255, 0.03)",
-                        border: dragOverDoc ? "2px dashed #818CF8" : "1px dashed rgba(255, 255, 255, 0.15)",
+                        background: dragOverDoc ? "rgba(118,185,0,0.12)" : "rgba(255, 255, 255, 0.03)",
+                        border: dragOverDoc ? "2px dashed var(--nvidia)" : "1px dashed rgba(255, 255, 255, 0.15)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
                         cursor: "pointer",
-                        marginBottom: "16px",
+                        marginBottom: "10px",
                         transition: "all 0.2s ease",
                       }}
                     >
@@ -1231,11 +1237,11 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                             height: "42px",
                             borderRadius: "12px",
                             background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2))",
-                            border: "1px solid rgba(129, 140, 248, 0.3)",
+                            border: "1px solid rgba(118,185,0,0.3)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#818CF8",
+                            color: "var(--nvidia)",
                           }}
                         >
                           <FileUp size={22} />
@@ -1244,7 +1250,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                           <h4 style={{ color: "#FFF", fontSize: "14px", margin: "0 0 2px 0", fontWeight: "600" }}>
                             {isExtractingDoc ? "Extracting text from Word document..." : "Upload Word Document (BRD / Requirement Spec)"}
                           </h4>
-                          <p style={{ color: "#94A3B8", fontSize: "12px", margin: 0 }}>
+                          <p style={{ color: "var(--text-3)", fontSize: "12px", margin: 0 }}>
                             Click to browse or drag & drop <strong>.docx</strong>, <strong>.doc</strong>, <strong>.txt</strong>, <strong>.md</strong> file here
                           </p>
                         </div>
@@ -1273,21 +1279,21 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                     placeholder="Paste Business Requirement Document (BRD) or Jira story scope, or upload a Word .docx file above..."
                     style={{
                       width: "100%",
-                      padding: "16px",
-                      background: "#1F2937",
+                      padding: "10px",
+                      background: "var(--surface-2)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "12px",
-                      color: "white",
+                      color: "var(--text)",
                       fontSize: "13.5px",
                       lineHeight: "1.6",
                       resize: "vertical",
                       outline: "none",
-                      marginBottom: "16px",
+                      marginBottom: "10px",
                     }}
                   />
 
                   {analysisError && (
-                    <div style={{ display: "flex", gap: "10px", background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#FCA5A5", padding: "10px 16px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+                    <div style={{ display: "flex", gap: "10px", background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#FCA5A5", padding: "10px 16px", borderRadius: "8px", fontSize: "13px", marginBottom: "10px" }}>
                       <AlertCircle size={16} style={{ marginTop: "2px" }} />
                       <span>{analysisError}</span>
                     </div>
@@ -1332,8 +1338,8 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                 <div>
-                  <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>Impact Mapping Results</h2>
-                  <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>
+                  <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>Impact Mapping Results</h2>
+                  <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>
                     Suggested starting files, dependent callers, and test suite coverages mapping for <strong>{requirementId}</strong>.
                   </p>
                 </div>
@@ -1353,31 +1359,31 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               {/* Metrics cards */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "20px" }}>
                 <div className="card" style={{ padding: "20px" }}>
-                  <p style={{ color: "#94A3B8", margin: 0, fontSize: "13px" }}>Impacted Files</p>
-                  <h1 style={{ color: "#22C55E", margin: "8px 0 0", fontSize: "28px", fontWeight: 700 }}>{fileCount}</h1>
+                  <p style={{ color: "var(--text-3)", margin: 0, fontSize: "13px" }}>Impacted Files</p>
+                  <h1 style={{ color: "#22C55E", margin: "8px 0 0", fontSize: "20px", fontWeight: 700 }}>{fileCount}</h1>
                 </div>
                 <div className="card" style={{ padding: "20px" }}>
-                  <p style={{ color: "#94A3B8", margin: 0, fontSize: "13px" }}>Affected Services</p>
-                  <h1 style={{ color: "#4F46E5", margin: "8px 0 0", fontSize: "28px", fontWeight: 700 }}>{serviceCount}</h1>
+                  <p style={{ color: "var(--text-3)", margin: 0, fontSize: "13px" }}>Affected Services</p>
+                  <h1 style={{ color: "var(--nvidia)", margin: "8px 0 0", fontSize: "20px", fontWeight: 700 }}>{serviceCount}</h1>
                 </div>
                 <div className="card" style={{ padding: "20px" }}>
-                  <p style={{ color: "#94A3B8", margin: 0, fontSize: "13px" }}>Tests to Update</p>
-                  <h1 style={{ color: "#F59E0B", margin: "8px 0 0", fontSize: "28px", fontWeight: 700 }}>{testCount}</h1>
+                  <p style={{ color: "var(--text-3)", margin: 0, fontSize: "13px" }}>Tests to Update</p>
+                  <h1 style={{ color: "#F59E0B", margin: "8px 0 0", fontSize: "20px", fontWeight: 700 }}>{testCount}</h1>
                 </div>
                 <div className="card" style={{ padding: "20px" }}>
-                  <p style={{ color: "#94A3B8", margin: 0, fontSize: "13px" }}>AI Confidence</p>
-                  <h1 style={{ color: "#22C55E", margin: "8px 0 0", fontSize: "28px", fontWeight: 700 }}>{confidence}</h1>
+                  <p style={{ color: "var(--text-3)", margin: 0, fontSize: "13px" }}>AI Confidence</p>
+                  <h1 style={{ color: "#22C55E", margin: "8px 0 0", fontSize: "20px", fontWeight: 700 }}>{confidence}</h1>
                 </div>
               </div>
 
               {/* Advisory Primer Content */}
-              <div className="card" style={{ padding: "24px", border: "1px solid rgba(129,140,248,0.25)", background: "linear-gradient(180deg, rgba(30,27,75,0.2) 0%, rgba(15,23,42,0.95) 100%)" }}>
+              <div className="card" style={{ padding: "24px", border: "1px solid rgba(118,185,0,0.2)", background: "var(--surface)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Sparkles size={18} color="#818CF8" />
+                    <Sparkles size={18} color="var(--nvidia)" />
                     <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>Gemini AI Suggested Code Map</h3>
                   </div>
-                  <span style={{ fontSize: "11px", background: "rgba(129,140,248,0.15)", color: "#818CF8", padding: "3px 8px", borderRadius: "12px", fontWeight: 600 }}>
+                  <span style={{ fontSize: "11px", background: "rgba(118,185,0,0.12)", color: "var(--nvidia)", padding: "3px 8px", borderRadius: "12px", fontWeight: 600 }}>
                     AI Advisory Engine
                   </span>
                 </div>
@@ -1388,10 +1394,10 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   <MarkdownView content={analysisResult} />
                 ) : (
                   <div>
-                    <p style={{ color: "#94A3B8", lineHeight: 1.6, margin: "0 0 10px" }}>
+                    <p style={{ color: "var(--text-3)", lineHeight: 1.6, margin: "0 0 10px" }}>
                       Run impact analysis mapping on a requirement story to inspect:
                     </p>
-                    <div style={{ paddingLeft: "14px", color: "#CBD5E1", fontSize: "13.5px", lineHeight: 1.8 }}>
+                    <div style={{ paddingLeft: "14px", color: "var(--text-2)", fontSize: "13.5px", lineHeight: 1.8 }}>
                       <p>• <strong>Primary Edit Targets</strong>: Files containing logic block modifications.</p>
                       <p>• <strong>Downstream Impacts</strong>: Caller contracts and schema structures modified.</p>
                       <p>• <strong>Tests to Update</strong>: Coverage files that require testing code assertions.</p>
@@ -1409,7 +1415,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               {/* File registry table */}
               <div className="card" style={{ padding: "24px" }}>
                 <h3 style={{ margin: "0 0 16px", fontSize: "15.5px", fontWeight: 600 }}>Impacted File Registry</h3>
-                <ImpactTable files={analysisData?.impactedFiles} />
+                <ImpactFileList files={analysisData?.impactedFiles || []} />
               </div>
             </div>
           )}
@@ -1421,8 +1427,8 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>AI Senior Staff Pre-Review</h2>
-                  <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Paste Git diff code block to review quality, find regressions, and draft pull request documentation.</p>
+                  <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>AI Senior Staff Pre-Review</h2>
+                  <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Paste Git diff code block to review quality, find regressions, and draft pull request documentation.</p>
                 </div>
                 <button onClick={() => navigate("/pr-generator")} className="primary-btn" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px", padding: "10px 16px" }}>
                   Draft Pull Request <ArrowRight size={13} />
@@ -1433,7 +1439,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "20px" }}>
                 <ReviewCard title="Quality Score" value={reviewData?.qualityScore || "95/100"} color="#22C55E" />
                 <ReviewCard title="Regression Risk" value={reviewData?.regressionRisk || "Low-Med"} color="#F59E0B" />
-                <ReviewCard title="Test Gap Detection" value={reviewData?.testGapsCount ? `${reviewData.testGapsCount} Missing` : "1 Missing"} color="#818CF8" />
+                <ReviewCard title="Test Gap Detection" value={reviewData?.testGapsCount ? `${reviewData.testGapsCount} Missing` : "1 Missing"} color="var(--nvidia)" />
                 <ReviewCard title="Security Clearance" value={reviewData?.securityStatus || "Pass"} color="#22C55E" />
               </div>
 
@@ -1441,10 +1447,10 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               <div className="card" style={{ padding: "24px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Code2 size={18} color="#818CF8" />
+                    <Code2 size={18} color="var(--nvidia)" />
                     <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>Committed Git Diff Source</h3>
                   </div>
-                  <small style={{ color: "#94A3B8" }}>Linked story: <strong>{requirementId}</strong></small>
+                  <small style={{ color: "var(--text-3)" }}>Linked story: <strong>{requirementId}</strong></small>
                 </div>
 
                 <textarea
@@ -1454,8 +1460,8 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   placeholder="Paste git diff here (e.g. diff --git a/src/controllers/...)"
                   style={{
                     width: "100%",
-                    padding: "16px",
-                    background: "#1F2937",
+                    padding: "10px",
+                    background: "var(--surface-2)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "12px",
                     color: "#A7F3D0",
@@ -1464,12 +1470,12 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                     lineHeight: 1.5,
                     resize: "vertical",
                     outline: "none",
-                    marginBottom: "16px",
+                    marginBottom: "10px",
                   }}
                 />
 
                 {reviewError && (
-                  <div style={{ display: "flex", gap: "10px", background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#FCA5A5", padding: "10px 16px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+                  <div style={{ display: "flex", gap: "10px", background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#FCA5A5", padding: "10px 16px", borderRadius: "8px", fontSize: "13px", marginBottom: "10px" }}>
                     <AlertCircle size={16} />
                     <span>{reviewError}</span>
                   </div>
@@ -1487,13 +1493,13 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               </div>
 
               {/* Review Report Display */}
-              <div className="card" style={{ padding: "24px", border: "1px solid rgba(34, 197, 94, 0.25)", background: "linear-gradient(180deg, rgba(20,83,45,0.05) 0%, rgba(15,23,42,0.95) 100%)" }}>
+              <div className="card" style={{ padding: "24px", border: "1px solid rgba(34, 197, 94, 0.25)", background: "var(--surface)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <ShieldCheck size={18} color="#22C55E" />
                     <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>Senior Staff Review Report</h3>
                   </div>
-                  <span style={{ fontSize: "11px", background: reviewResult ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.05)", color: reviewResult ? "#22C55E" : "#94A3B8", padding: "3px 8px", borderRadius: "12px", fontWeight: 600 }}>
+                  <span style={{ fontSize: "11px", background: reviewResult ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.05)", color: reviewResult ? "#22C55E" : "var(--text-3)", padding: "3px 8px", borderRadius: "12px", fontWeight: 600 }}>
                     {reviewResult ? "Report Active" : "Waiting for diff"}
                   </span>
                 </div>
@@ -1504,10 +1510,10 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                   <MarkdownView content={reviewResult} />
                 ) : (
                   <div>
-                    <p style={{ color: "#94A3B8", lineHeight: 1.6, margin: "0 0 10px" }}>
+                    <p style={{ color: "var(--text-3)", lineHeight: 1.6, margin: "0 0 10px" }}>
                       Review report includes:
                     </p>
-                    <div style={{ paddingLeft: "14px", color: "#CBD5E1", fontSize: "13.5px", lineHeight: 1.8 }}>
+                    <div style={{ paddingLeft: "14px", color: "var(--text-2)", fontSize: "13.5px", lineHeight: 1.8 }}>
                       <p>✔ <strong>Code Standards check</strong>: lint findings, conventions, async structures.</p>
                       <p>✔ <strong>Regression Risk check</strong>: upstream caller integrations, backward compatibility.</p>
                       <p>✔ <strong>Test Coverage Gaps</strong>: uncovered code paths, boundary checks.</p>
@@ -1525,13 +1531,18 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
           {activeTab === "pr" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div>
-                <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>AI Pull Request Draft</h2>
-                <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Generated from requirement scope, files touched registry, and AI code review validations.</p>
+                <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>AI Pull Request Draft</h2>
+                <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Generated from requirement scope, files touched registry, and AI code review validations.</p>
+              </div>
+
+              {/* Pipeline progress */}
+              <div className="card" style={{ padding: "16px 20px" }}>
+                <PipelineStatus workflow={workflow} />
               </div>
 
               {/* Title Section */}
               <div className="card" style={{ padding: "20px" }}>
-                <label style={{ ...LABEL_STYLE, fontSize: "13.5px", color: "#94A3B8" }}>PR Title Draft</label>
+                <label style={{ ...LABEL_STYLE, fontSize: "13.5px", color: "var(--text-3)" }}>PR Title Draft</label>
                 <input
                   type="text"
                   readOnly
@@ -1543,9 +1554,9 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
               {/* Markdown Description */}
               <div className="card" style={{ padding: "20px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                  <label style={{ ...LABEL_STYLE, fontSize: "13.5px", color: "#94A3B8", margin: 0 }}>PR Description Template (Markdown)</label>
+                  <label style={{ ...LABEL_STYLE, fontSize: "13.5px", color: "var(--text-3)", margin: 0 }}>PR Description Template (Markdown)</label>
                   {reviewResult && (
-                    <span style={{ fontSize: "11px", color: "#818CF8", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <span style={{ fontSize: "11px", color: "var(--nvidia)", display: "flex", alignItems: "center", gap: "4px" }}>
                       <Sparkles size={12} /> Auto-synthesized from Gemini Pre-Review
                     </span>
                   )}
@@ -1586,46 +1597,29 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             <div style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: "25px" }}>
               {/* Agent Grid */}
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", justifyContent: "center", padding: "0 0 8px" }}>
+                  <IntelligenceCore size={320} />
+                </div>
                 <div>
-                  <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>Active Agent Network</h2>
-                  <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Check health telemetry and metrics of each isolated agent inside the intelligence swarm.</p>
+                  <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>Active Agent Network</h2>
+                  <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Check health telemetry and metrics of each isolated agent inside the intelligence swarm.</p>
                 </div>
                 {AGENTS_LIST.map((agent) => (
-                  <div key={agent.id} className="card" style={{ padding: "20px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                        <div style={{ width: "42px", height: "42px", borderRadius: "10px", background: "rgba(79, 70, 229, 0.12)", display: "flex", justifyContent: "center", alignItems: "center", color: "#818CF8" }}>
-                          <Bot size={22} />
-                        </div>
-                        <div>
-                          <h3 style={{ margin: 0, fontSize: "15px", color: "white", fontWeight: 600 }}>{agent.name}</h3>
-                          <p style={{ color: "#94A3B8", fontSize: "12px", marginTop: "2px", margin: 0 }}>{agent.role}</p>
-                        </div>
-                      </div>
-                      <span style={{ fontSize: "11px", background: "rgba(34,197,94,0.15)", color: "#22C55E", padding: "3px 8px", borderRadius: "12px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
-                        <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22C55E" }} /> {agent.status}
-                      </span>
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "14px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                      <div>
-                        <small style={{ color: "#94A3B8", fontSize: "11px" }}>Model LLM</small>
-                        <p style={{ margin: "2px 0 0", color: "#E2E8F0", fontSize: "12px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
-                          <Cpu size={12} color="#818CF8" /> {agent.model}
-                        </p>
-                      </div>
-                      <div>
-                        <small style={{ color: "#94A3B8", fontSize: "11px" }}>Tasks Sync</small>
-                        <p style={{ margin: "2px 0 0", color: "#E2E8F0", fontSize: "12px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
-                          <Zap size={12} color="#F59E0B" /> {agent.tasksCompleted} runs
-                        </p>
-                      </div>
-                      <div>
-                        <small style={{ color: "#94A3B8", fontSize: "11px" }}>Accuracy Benchmark</small>
-                        <p style={{ margin: "2px 0 0", color: "#22C55E", fontSize: "12.5px", fontWeight: 600 }}>{agent.accuracy}</p>
-                      </div>
-                    </div>
-                  </div>
+                  <AgentCard
+                    key={agent.id}
+                    name={agent.name}
+                    role={agent.role}
+                    model={agent.model}
+                    state={
+                      agent.id === 'coord-agent' ? (workflow?.coordinator || 'Waiting') :
+                      agent.id === 'req-agent' ? (workflow?.requirement || 'Waiting') :
+                      agent.id === 'impact-agent' ? (workflow?.impact || 'Waiting') :
+                      agent.id === 'review-agent' ? (workflow?.review || 'Waiting') :
+                      agent.id === 'pr-agent' ? (workflow?.pr || 'Waiting') : 'Waiting'
+                    }
+                    tasksCompleted={agent.tasksCompleted}
+                    accuracy={agent.accuracy}
+                  />
                 ))}
               </div>
 
@@ -1642,15 +1636,15 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
           {activeTab === "analytics" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
               <div>
-                <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>Quality & Health Insights</h2>
-                <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Telemetry trends showing code hot spots, defect prevention rates, and safety scopes.</p>
+                <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>Quality & Health Insights</h2>
+                <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Telemetry trends showing code hot spots, defect prevention rates, and safety scopes.</p>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
                 {/* Hotspots Card */}
                 <div className="card" style={{ padding: "24px" }}>
                   <h3 style={{ fontSize: "15.5px", fontWeight: 600, margin: "0 0 4px" }}>🔥 Most Impacted Source Hotspots</h3>
-                  <p style={{ color: "#94A3B8", fontSize: "12.5px", margin: "0 0 16px" }}>Code paths that get touched frequently by requirement changes.</p>
+                  <p style={{ color: "var(--text-3)", fontSize: "12.5px", margin: "0 0 16px" }}>Code paths that get touched frequently by requirement changes.</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                     {[
                       { file: "src/controllers/authController.js", count: 42, risk: "High" },
@@ -1659,9 +1653,9 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                       { file: "src/middlewares/auth.js", count: 19, risk: "Low" },
                     ].map((item, idx) => (
                       <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px" }}>
-                        <code style={{ fontSize: "12px", color: "#E2E8F0" }}>{item.file}</code>
+                        <code style={{ fontSize: "12px", color: "var(--text)" }}>{item.file}</code>
                         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                          <span style={{ fontSize: "12px", color: "#94A3B8" }}>{item.count} updates</span>
+                          <span style={{ fontSize: "12px", color: "var(--text-3)" }}>{item.count} updates</span>
                           <span style={{ fontSize: "11px", fontWeight: 600, color: item.risk === "High" ? "#EF4444" : item.risk === "Medium" ? "#F59E0B" : "#22C55E" }}>
                             {item.risk} Risk
                           </span>
@@ -1674,17 +1668,17 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                 {/* Reliability metrics */}
                 <div className="card" style={{ padding: "24px" }}>
                   <h3 style={{ fontSize: "15.5px", fontWeight: 600, margin: "0 0 4px" }}>🛡️ Swarm Verification Metrics</h3>
-                  <p style={{ color: "#94A3B8", fontSize: "12.5px", margin: "0 0 18px" }}>Aggregated health status scores for scanned packages.</p>
+                  <p style={{ color: "var(--text-3)", fontSize: "12.5px", margin: "0 0 18px" }}>Aggregated health status scores for scanned packages.</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     {[
                       { label: "Unit Test Coverage", value: 91, color: "#38BDF8" },
-                      { label: "AI Review Agreement", value: 96, color: "#818CF8" },
+                      { label: "AI Review Agreement", value: 96, color: "var(--nvidia)" },
                       { label: "Linting & Best Practice Standards", value: 98, color: "#22C55E" },
                       { label: "Security Risk Clearance", value: 89, color: "#F59E0B" },
                     ].map((item, idx) => (
                       <div key={idx}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px", fontSize: "13px" }}>
-                          <span style={{ color: "#CBD5E1" }}>{item.label}</span>
+                          <span style={{ color: "var(--text-2)" }}>{item.label}</span>
                           <span style={{ fontWeight: 600, color: item.color }}>{item.value}%</span>
                         </div>
                         <div style={{ width: "100%", height: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "4px", overflow: "hidden" }}>
@@ -1704,26 +1698,23 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
           {activeTab === "settings" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
               <div>
-                <h2 style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "600", margin: 0 }}>Workspace Configuration</h2>
-                <p style={{ color: "#94A3B8", fontSize: "13px", margin: "4px 0 0" }}>Set model weights, link developer accounts, and review database statuses.</p>
+                <h2 style={{ color: "var(--text)", fontSize: "20px", fontWeight: "600", margin: 0 }}>Workspace Configuration</h2>
+                <p style={{ color: "var(--text-3)", fontSize: "13px", margin: "4px 0 0" }}>Set model weights, link developer accounts, and review database statuses.</p>
               </div>
 
               <form onSubmit={handleSaveSettings} style={{ maxWidth: "800px", display: "flex", flexDirection: "column", gap: "20px" }}>
                 {/* AI config */}
                 <div className="card" style={{ padding: "24px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                    <Key size={18} color="#818CF8" />
-                    <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>Gemini AI Settings</h3>
+                    <Key size={18} color="var(--nvidia)" />
+                    <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>AI Provider</h3>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    <div>
-                      <label style={LABEL_STYLE}>Active Model Engine</label>
-                      <select value={aiModel} onChange={(e) => setAiModel(e.target.value)} style={INPUT_STYLE}>
-                        <option value="nvidia/llama-3.1-nemotron-70b-instruct">Gemini 3.6 Flash (Default - Ultra fast & State-of-the-art)</option>
-                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep AST analysis)</option>
-                        <option value="nvidia/llama-3.1-nemotron-70b-instruct">Gemini 1.5 Flash</option>
-                      </select>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--nvidia)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+                      NVIDIA NIM — Active Provider
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>
+                      Model: {import.meta.env.VITE_NVIDIA_MODEL ?? 'nvidia/llama-3.1-nemotron-70b-instruct'}
                     </div>
                   </div>
                 </div>
@@ -1734,7 +1725,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
                     <GitBranch size={18} color="#F59E0B" />
                     <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>Integration Username Mapping</h3>
                   </div>
-                  <p style={{ color: "#94A3B8", fontSize: "12.5px", margin: "0 0 16px" }}>
+                  <p style={{ color: "var(--text-3)", fontSize: "12.5px", margin: "0 0 16px" }}>
                     Map webhook signals (GitHub pusher, Jira assignee) to route reports to your address.
                   </p>
 
@@ -1794,14 +1785,14 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
       {/* Add New File Modal */}
       {showAddModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(2,6,23,0.75)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
-          <div className="card" style={{ width: "100%", maxWidth: "700px", padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div className="card" style={{ width: "100%", maxWidth: "700px", padding: "24px", display: "flex", flexDirection: "column", gap: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "16px", color: "white" }}>Index New Source File</h3>
-              <button onClick={() => setShowAddModal(false)} style={{ background: "transparent", border: "none", color: "#94A3B8", cursor: "pointer" }}><X size={18} /></button>
+              <h3 style={{ margin: 0, fontSize: "14px", color: "var(--text)" }}>Index New Source File</h3>
+              <button onClick={() => setShowAddModal(false)} style={{ background: "transparent", border: "none", color: "var(--text-3)", cursor: "pointer" }}><X size={18} /></button>
             </div>
 
             <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: "10px", padding: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "13px", color: "#94A3B8" }}>Load directly from your local computer:</span>
+              <span style={{ fontSize: "13px", color: "var(--text-3)" }}>Load directly from your local computer:</span>
               <label className="secondary-btn" style={{ fontSize: "12px", padding: "6px 12px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", margin: 0 }}>
                 <Upload size={13} /> Select Local File
                 <input type="file" onChange={handleSingleLocalFileSelect} style={{ display: "none" }} />
@@ -1860,12 +1851,12 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
       {/* Batch Upload Modal */}
       {showBatchModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(2,6,23,0.75)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
-          <div className="card" style={{ width: "100%", maxWidth: "750px", padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div className="card" style={{ width: "100%", maxWidth: "750px", padding: "24px", display: "flex", flexDirection: "column", gap: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "16px", color: "white" }}>Batch Index Files</h3>
-              <button onClick={() => setShowBatchModal(false)} style={{ background: "transparent", border: "none", color: "#94A3B8", cursor: "pointer" }}><X size={18} /></button>
+              <h3 style={{ margin: 0, fontSize: "14px", color: "var(--text)" }}>Batch Index Files</h3>
+              <button onClick={() => setShowBatchModal(false)} style={{ background: "transparent", border: "none", color: "var(--text-3)", cursor: "pointer" }}><X size={18} /></button>
             </div>
-            <p style={{ color: "#94A3B8", fontSize: "13px", margin: 0 }}>
+            <p style={{ color: "var(--text-3)", fontSize: "13px", margin: 0 }}>
               Paste files separated by <code>--- path/to/file ---</code> separators to index multiple files simultaneously.
             </p>
 
@@ -1889,9 +1880,9 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             {batchFilesPreview.length > 0 && (
               <div style={{ maxHeight: "100px", overflow: "auto", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "8px 12px" }}>
                 {batchFilesPreview.map((item, idx) => (
-                  <div key={idx} style={{ fontSize: "12px", fontFamily: "monospace", color: "#CBD5E1", display: "flex", justifyContent: "space-between" }}>
+                  <div key={idx} style={{ fontSize: "12px", fontFamily: "monospace", color: "var(--text-2)", display: "flex", justifyContent: "space-between" }}>
                     <span>{item.filePath}</span>
-                    <span style={{ color: "#94A3B8" }}>({item.lineCount} lines)</span>
+                    <span style={{ color: "var(--text-3)" }}>({item.lineCount} lines)</span>
                   </div>
                 ))}
               </div>
@@ -1911,4 +1902,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 };
 
 export default WorkspaceHub;
+
+
+
 
