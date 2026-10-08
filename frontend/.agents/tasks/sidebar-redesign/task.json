@@ -1,0 +1,7 @@
+{
+  "task_id": "task-sidebar-redesign",
+  "task_description": "Redesign the ImpactIQ frontend sidebar/navigation. Replace the broken fixed-position 56px icon-only sidebar with a collapsible 240px/64px sidebar inside a proper AppLayout shell so page content never hides under the sidebar. No backend changes. No new dependencies.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}
