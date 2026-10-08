@@ -11,7 +11,7 @@ import CodebaseFiles from "../pages/CodebaseFiles";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
-import AppLayout from "../components/AppLayout";
+import AppShell from "../components/AppShell";
 import { useAuth } from "../context/AuthContext";
 
 const AppRoutes = () => {
@@ -30,39 +30,39 @@ const AppRoutes = () => {
       {/* Authenticated routes — wrapped in AppLayout */}
       <Route
         path="/dashboard"
-        element={isAuthenticated ? <AppLayout><Dashboard /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><Dashboard /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/files"
-        element={isAuthenticated ? <AppLayout><CodebaseFiles /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><CodebaseFiles /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/requirements"
-        element={isAuthenticated ? <AppLayout><Requirement /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><Requirement /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/impact-analysis"
-        element={isAuthenticated ? <AppLayout><ImpactAnalysis /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><ImpactAnalysis /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/agents"
-        element={isAuthenticated ? <AppLayout><Agents /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><Agents /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/code-review"
-        element={isAuthenticated ? <AppLayout><CodeReview /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><CodeReview /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/pr-generator"
-        element={isAuthenticated ? <AppLayout><PRGenerator /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><PRGenerator /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/analytics"
-        element={isAuthenticated ? <AppLayout><Analytics /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><Analytics /></AppShell> : <Navigate to="/login" />}
       />
       <Route
         path="/settings"
-        element={isAuthenticated ? <AppLayout><Settings /></AppLayout> : <Navigate to="/login" />}
+        element={isAuthenticated ? <AppShell><Settings /></AppShell> : <Navigate to="/login" />}
       />
 
       {/* Fallback */}

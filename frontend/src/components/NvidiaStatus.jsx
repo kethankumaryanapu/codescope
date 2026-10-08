@@ -12,7 +12,7 @@ const NvidiaStatus = () => (
       boxShadow:'0 0 6px rgba(118,185,0,0.7)',}}/>
     <div style={{display:'flex', flexDirection:'column', lineHeight:1.2}}>
       <span style={{fontSize:'10px', fontWeight:700, color:'#76b900',
-        letterSpacing:'0.08em', fontFamily:'var(--font-mono)',}}>NVIDIA NIM</span>
+        letterSpacing:'0.08em', fontFamily:'var(--font-mono)',}}>AI Engine</span>
       <span style={{fontSize:'10px', color:'var(--text-3)',
         fontFamily:'var(--font-mono)', letterSpacing:'0.02em',
         maxWidth:'200px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',}}>{MODEL}</span>

@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import './auth.css';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -41,175 +42,131 @@ const Register = () => {
 
   const displayedError = localError || authError;
 
-  const inputWrapStyle = {
-    display: 'flex', alignItems: 'center',
-    background: 'var(--surface-2)', border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)', padding: '10px 14px', gap: '8px',
-  };
-
-  const inputStyle = {
-    background: 'transparent', border: 'none', outline: 'none',
-    color: 'var(--text)', fontSize: '14px', width: '100%',
-  };
-
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex',
-      alignItems: 'center', justifyContent: 'center',
-      padding: '24px', background: 'var(--bg)',
-    }}>
-      <div style={{
-        width: '100%', maxWidth: '440px',
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-lg)', padding: '40px',
-      }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-          <div style={{
-            width: '32px', height: '32px', borderRadius: '4px',
-            background: 'var(--nvidia)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: '#000' }}>IQ</span>
+    <div className="auth-page">
+      {/* ── Left panel ── */}
+      <div className="auth-left">
+        <div className="auth-left-bg" />
+        <div className="auth-left-overlay" />
+        <div className="auth-left-content">
+          <div className="auth-logomark">IQ</div>
+          <div className="auth-wordmark">
+            <span className="auth-wordmark-impact">Impact</span>
+            <span className="auth-wordmark-iq">IQ</span>
           </div>
-          <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text)' }}>ImpactIQ</span>
-        </div>
-        <p style={{
-          fontSize: '11px', color: 'var(--text-3)',
-          fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', marginBottom: '32px',
-        }}>
-          POWERED BY NVIDIA NIM
-        </p>
-
-        {/* Header */}
-        <div style={{ marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)', margin: '0 0 6px 0' }}>
-            Create Account
-          </h2>
-          <p style={{ color: 'var(--text-3)', fontSize: '13px', margin: 0 }}>
-            Fill in your details to get started.
+          <p className="auth-tagline">
+            AI-powered code intelligence for understanding, analyzing and delivering complex software changes.
           </p>
         </div>
+        <div className="auth-attribution">
+          Built on NVIDIA NIM · Llama 3.1 70B
+        </div>
+      </div>
 
-        {/* Error */}
-        {displayedError && (
-          <div style={{
-            padding: '10px 14px',
-            background: 'rgba(204,51,51,0.12)', border: '1px solid rgba(204,51,51,0.3)',
-            borderRadius: 'var(--radius)', color: 'var(--error)',
-            display: 'flex', alignItems: 'center', gap: '8px',
-            marginBottom: '20px', fontSize: '13px',
-          }}>
-            <AlertCircle size={15} />
-            <span>{displayedError}</span>
-          </div>
-        )}
+      {/* ── Right panel ── */}
+      <div className="auth-right">
+        <div className="auth-card">
+          <h2 className="auth-card-title">Create account</h2>
+          <p className="auth-card-subtitle">Get started with ImpactIQ</p>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Full Name */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '6px' }}>
-              Full Name
-            </label>
-            <div style={inputWrapStyle}
-              onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--nvidia)')}
-              onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <User size={15} color="var(--text-3)" />
-              <input
-                type="text" value={name} onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Jane Smith" required style={inputStyle}
-              />
+          {displayedError && (
+            <div className="auth-error">
+              <AlertCircle size={15} />
+              <span>{displayedError}</span>
             </div>
-          </div>
+          )}
 
-          {/* Email */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '6px' }}>
-              Work Email
-            </label>
-            <div style={inputWrapStyle}
-              onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--nvidia)')}
-              onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <Mail size={15} color="var(--text-3)" />
-              <input
-                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@company.com" required style={inputStyle}
-              />
+          <form onSubmit={handleSubmit} className="auth-form">
+            {/* Full Name */}
+            <div>
+              <label className="auth-label">Full Name</label>
+              <div className="auth-input-wrap">
+                <User size={15} color="#606060" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Jane Smith"
+                  required
+                  className="auth-input"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Role */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '6px' }}>
-              Engineering Role
-            </label>
-            <div style={inputWrapStyle}
-              onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--nvidia)')}
-              onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <Briefcase size={15} color="var(--text-3)" />
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="Senior Staff Engineer" style={{ background: '#1a1a1a' }}>Senior Staff Engineer</option>
-                <option value="Principal Architect" style={{ background: '#1a1a1a' }}>Principal Architect</option>
-                <option value="Tech Lead / Engineering Manager" style={{ background: '#1a1a1a' }}>Tech Lead / Engineering Manager</option>
-                <option value="Full-Stack Developer" style={{ background: '#1a1a1a' }}>Full-Stack Developer</option>
-                <option value="QA / SDET Automation Lead" style={{ background: '#1a1a1a' }}>QA / SDET Automation Lead</option>
-              </select>
+            {/* Email */}
+            <div>
+              <label className="auth-label">Work Email</label>
+              <div className="auth-input-wrap">
+                <Mail size={15} color="#606060" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  required
+                  className="auth-input"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Password */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', marginBottom: '6px' }}>
-              Password
-            </label>
-            <div style={inputWrapStyle}
-              onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--nvidia)')}
-              onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <Lock size={15} color="var(--text-3)" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password} onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters" required style={inputStyle}
-              />
-              <button
-                type="button" onClick={() => setShowPassword(!showPassword)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-3)', cursor: 'pointer', padding: 0, display: 'flex' }}
-              >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
+            {/* Role */}
+            <div>
+              <label className="auth-label">Engineering Role</label>
+              <div className="auth-input-wrap">
+                <Briefcase size={15} color="#606060" />
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="auth-select"
+                >
+                  <option value="Senior Staff Engineer">Senior Staff Engineer</option>
+                  <option value="Principal Architect">Principal Architect</option>
+                  <option value="Tech Lead / Engineering Manager">Tech Lead / Engineering Manager</option>
+                  <option value="Full-Stack Developer">Full-Stack Developer</option>
+                  <option value="QA / SDET Automation Lead">QA / SDET Automation Lead</option>
+                </select>
+              </div>
             </div>
+
+            {/* Password */}
+            <div>
+              <label className="auth-label">Password</label>
+              <div className="auth-input-wrap">
+                <Lock size={15} color="#606060" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  required
+                  className="auth-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="auth-eye-btn"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button type="submit" disabled={loading} className="auth-submit-btn">
+              {loading ? 'Creating Account...' : (
+                <>
+                  <span>Create Account</span>
+                  <ArrowRight size={15} />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="auth-toggle">
+            Already have an account?{' '}
+            <Link to="/login">Sign in</Link>
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginTop: '8px', padding: '11px',
-              borderRadius: 'var(--radius)', background: 'var(--nvidia)',
-              border: 'none', color: '#000', fontSize: '14px', fontWeight: 700,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              cursor: loading ? 'not-allowed' : 'pointer', width: '100%',
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? 'Creating Account...' : (
-              <><span>Create Account</span><ArrowRight size={15} /></>
-            )}
-          </button>
-        </form>
-
-        {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: 'var(--text-3)' }}>
-          Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--nvidia)', fontWeight: 600, textDecoration: 'none' }}>
-            Sign In
-          </Link>
         </div>
       </div>
     </div>
