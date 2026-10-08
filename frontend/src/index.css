@@ -337,6 +337,19 @@ button {
   }
 }
 
+/* ── Mobile: sidebar becomes overlay, app-main takes full width ── */
+@media (max-width: 767px) {
+  .app-shell {
+    overflow: visible;
+  }
+
+  .app-main {
+    width: 100%;
+    /* Sidebar is position:fixed in mobile, not a flex sibling */
+    flex: 1;
+  }
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
