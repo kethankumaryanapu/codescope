@@ -1,8 +1,6 @@
 ﻿import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import mammoth from "mammoth";
-import Topbar from "../components/Topbar";
-import Sidebar from "../components/Sidebar";
 import MetricCard from "../components/MetricCard";
 import AIStatus from "../components/AIStatus";
 import DependencyGraph from "../components/DependencyGraph";
@@ -619,12 +617,7 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
 
   return (
     <>
-      <Topbar />
-
-      <div className="dashboard-shell" style={{ display: "flex", background: "transparent" }}>
-        <Sidebar />
-
-        <div className="dashboard-main" style={{ flex: 1, padding: "20px", minWidth: 0 }}>
+      <div className="page-content-inner" style={{ flex: 1, padding: "20px", minWidth: 0 }}>
           {/* Header Banner */}
           <div className="hero-panel" style={{ marginBottom: "20px", borderRadius: "var(--radius-lg)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", flexWrap: "wrap" }}>
@@ -1780,7 +1773,6 @@ const WorkspaceHub = ({ activeTab = "overview" }) => {
             </div>
           )}
         </div>
-      </div>
 
       {/* Add New File Modal */}
       {showAddModal && (

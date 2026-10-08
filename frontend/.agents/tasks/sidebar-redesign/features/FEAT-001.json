@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-001",
+  "type": "refactor",
+  "description": "Create SidebarContext + AppLayout shell and fix the root layout overlap bug. This is the foundational infrastructure FEAT. FEAT-002 depends on it. The core problem: WorkspaceHub.jsx renders <Topbar /> and <Sidebar /> inline, and .dashboard-main has no left-offset so content goes under the 56px sidebar. The fix is: (1) create SidebarContext to own expanded/collapsed state; (2) create a shared AppLayout component that renders Sidebar + a main area (Topbar + page content) as CSS flex siblings so width is accounted for; (3) wire AppLayout into AppRoutes so every authenticated route is wrapped; (4) remove the duplicate <Topbar /> and <Sidebar /> from WorkspaceHub.jsx; (5) add the CSS layout classes to index.css.",
+  "status": "completed",
+  "steps": [
+    "Create src/context/SidebarContext.jsx. Export SidebarProvider and useSidebar. State shape: { isExpanded: bool, toggle: fn }. Initialize from localStorage key 'impactiq_sidebar_expanded' (default: true). Persist changes back to localStorage on every toggle. Wrap value in useMemo to avoid unnecessary re-renders.",
+    "Create src/components/AppLayout.jsx. It renders a top-level div with className 'app-shell' that is a flex row filling 100vh. Inside: (a) <Sidebar /> as the fixed-width flex child, (b) a div with className 'app-main' that is a flex column filling the remaining width. Inside app-main: <Topbar /> (sticky top), then a div with className 'page-content' that renders {children}. Import SidebarProvider and wrap the shell with it so Sidebar and all children share the context.",
+    "Add CSS to src/index.css in a new '/* APP SHELL */' section. Define CSS custom properties: --sidebar-w-expanded: 248px; --sidebar-w-collapsed: 64px; --topbar-h: 48px. Add .app-shell { display: flex; height: 100vh; overflow: hidden; background: var(--bg); }. Add .app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }. Add .page-content { flex: 1; overflow-y: auto; }. These replace the broken .dashboard-shell / .dashboard-main approach for the layout structure.",
+    "Modify src/routes/AppRoutes.jsx. Import AppLayout. Wrap every authenticated route's element in <AppLayout>: e.g. element={isAuthenticated ? <AppLayout><Dashboard /></AppLayout> : <Navigate to='/login' />}. Public routes (login, register, forgot-password) must NOT be wrapped in AppLayout — they render standalone.",
+    "Modify src/pages/WorkspaceHub.jsx. Remove the <Topbar /> import and JSX usage (line ~1 of return). Remove the <Sidebar /> import and JSX usage. Remove the outer <div className='dashboard-shell'> wrapper and its inline display:flex style — its job is now done by AppLayout. The WorkspaceHub return should start directly with the inner content div (currently className='dashboard-main'). Rename that div's className to 'page-content-inner' and keep its padding:20px inline style. This ensures WorkspaceHub renders only page content, not the shell."
+  ],
+  "acceptance_criteria": [
+    "npm run build completes with zero errors after this FEAT",
+    "SidebarContext is importable via useSidebar() hook from src/context/SidebarContext.jsx",
+    "AppLayout.jsx exists in src/components/ and wraps Sidebar + Topbar + children",
+    "WorkspaceHub.jsx no longer imports or renders <Topbar /> or <Sidebar />",
+    "AppRoutes.jsx wraps all 9 authenticated routes with <AppLayout> and no public routes",
+    "The .app-shell and .app-main CSS classes exist in index.css with correct flex layout",
+    "--sidebar-w-expanded and --sidebar-w-collapsed CSS variables are defined in :root"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\Kethan Kumar Yanapu\\OneDrive\\Desktop\\ImpactIQ\\ImpactIQ\\frontend' && npm run build — must complete with 'built in Xms' and zero errors"
+  ],
+  "blocked_reason": null,
+  "findings": "1. WorkspaceHub.jsx had three levels of nesting: fragment > dashboard-shell div > dashboard-main div. Removing dashboard-shell required removing its orphaned closing </div> separately from the opening block change. 2. The existing Sidebar component is a fixed-position element (position:fixed, top:48px) — FEAT-002 must replace it with a flex-child element (position:static or relative) so that the app-shell flex layout actually accounts for sidebar width. The current sidebar still overlaps content because it uses fixed positioning. 3. AppLayout passes a mobileMenuSlot prop to Topbar, but Topbar does not yet consume it — FEAT-002 should update Topbar to render the slot or AppLayout can place the mobile button differently. 4. CSS variables --sidebar-w-expanded and --sidebar-w-collapsed are defined in a second :root block in index.css (inside the APP SHELL section) — valid CSS, both :root blocks merge."
+}
