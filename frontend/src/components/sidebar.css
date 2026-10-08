@@ -226,7 +226,7 @@
 /* ── Tooltip (shown only when collapsed, on hover) ── */
 .sidebar-tooltip {
   position: absolute;
-  left: calc(var(--sidebar-w-collapsed) - 8px);
+  left: calc(var(--sidebar-w-collapsed) + 8px);
   top: 50%;
   transform: translateY(-50%);
   background: var(--surface-3);
