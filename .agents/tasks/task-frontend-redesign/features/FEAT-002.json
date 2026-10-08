@@ -1,0 +1,41 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Build the 7 new/reskinned visual components that WorkspaceHub tabs will consume. Depends on FEAT-001 for CSS token names. Each component is independent of the others and can be written in any order. Existing components AIStatus, DependencyGraph, MetricCard, ImpactTable, ReviewCard, MarkdownView are reskinned in place (no renames — WorkspaceHub already imports them). New components are created as new files.",
+  "status": "pending",
+  "steps": [
+    "Step 1 — Overwrite frontend/src/components/NvidiaStatus.jsx (replaces FEAT-001 stub). Green animated dot + label 'NVIDIA NIM' in --text, model name from `import.meta.env.VITE_NVIDIA_MODEL ?? 'nvidia/llama-3.1-nemotron-70b-instruct'` in --text-3 monospace font. Status text 'CONNECTED' in --nvidia. Pill shape: background var(--surface-2), border 1px solid var(--border-2), padding 6px 12px, border-radius var(--radius). The green dot pulses using the nvidiaPulse keyframe from index.css. NEVER render any API key or env variable that contains 'KEY', 'SECRET', or 'TOKEN'.",
+
+    "Step 2 — Create frontend/src/components/IntelligenceCore.jsx. SVG-based orbiting agent visualization using CSS transforms + SVG, NO Three.js or R3F. Central element: 80px circle with concentric rings (stroke var(--border-2)), label 'INTELLIGENCE CORE' in tiny monospace. 5 orbiting nodes placed at equal angles around a 180px orbit radius: Coordinator (top), Requirement (top-right), Impact (bottom-right), Review (bottom-left), PR (top-left). Each node is a 40x40 rect with 8px rx. Node state maps from workflow context (useAnalysis().workflow): Waiting→fill var(--surface-2) stroke var(--border-2) icon gray; Ready→fill var(--surface-3) stroke var(--border) icon var(--text-2); Running→fill rgba(118,185,0,0.15) stroke var(--nvidia) icon var(--nvidia) + CSS animation nvidiaPulse on the stroke; Completed→fill var(--nvidia-dim) stroke var(--nvidia) icon var(--nvidia); Failed→fill rgba(204,51,51,0.15) stroke var(--error) icon var(--error). Connection lines (SVG <line>) from center to each node: stroke var(--border) normally, stroke var(--nvidia) with strokeDasharray animation when that agent is Running. Progress ring: outer <circle> with strokeDasharray=(progress/100)*circumference using workflow.progress. The component accepts no props — reads directly from useAnalysis(). Container: square ~420x420px, background var(--surface), border 1px solid var(--border), border-radius var(--radius-lg), centered.",
+
+    "Step 3 — Create frontend/src/components/AgentCard.jsx. Props: name (string), state (string: Waiting|Ready|Running|Completed|Failed), description (string), model (string), isActive (bool). Card: background var(--surface), border 1px solid var(--border), border-radius var(--radius), padding 16px. Left: small colored dot (color matches state: Running=--nvidia, Completed=--nvidia, Failed=--error, else --text-3) + agent name in --text font-weight:600 + state label in matching color. Body: description in --text-2 font-size:13px monospace. Footer row: model name in --text-3 font-mono font-size:11px. When isActive: border-color var(--nvidia), background rgba(118,185,0,0.05). When Running: a thin green top border (3px solid var(--nvidia)) as an 'active' indicator. No fake progress percentages.",
+
+    "Step 4 — Create frontend/src/components/ImpactFileList.jsx. Props: files (array from analysisData.impactedFiles). Each file row: filepath in --font-mono --text font-size:13px, module chip (background var(--surface-3) color var(--text-2) border var(--border)), risk badge: High=background rgba(204,51,51,0.15) color var(--error), Medium=background rgba(230,126,0,0.15) color var(--warning), Low=background rgba(118,185,0,0.15) color var(--nvidia). Empty state shows FileCode icon + instructional text. Table header: File Path | Module | Risk — in --text-3 font-size:12px uppercase letter-spacing. Row hover: background var(--surface-2). The component is a visual replacement for ImpactTable (which still exists and is used as fallback). WorkspaceHub's impact tab will use ImpactFileList instead of ImpactTable for the main file list.",
+
+    "Step 5 — Create frontend/src/components/PipelineStatus.jsx. Horizontal pipeline: Requirement → Impact Analysis → Code Review → PR Generation. Reads workflow context via useAnalysis().workflow. Each stage: label above, status dot below. Active/completed stage: green fill. Current running stage: pulsing green. Waiting: gray. Connecting arrows between stages. Compact height ~80px. Layout: flexbox row, each stage takes equal width. Used in the PR tab of WorkspaceHub.",
+
+    "Step 6 — Create frontend/src/components/StatCard.jsx. Props: label (string), value (string|number), unit (string, optional), trend (string: 'up'|'down'|null, optional), color (string, optional, defaults to --text). Simple card: background var(--surface), border 1px solid var(--border), border-radius var(--radius), padding 16px 20px. Value in large mono font (32px weight:700) colored by color prop. Label in --text-2 12px uppercase. Unit (if provided) in --text-3 14px next to value. Trend arrow: up=ArrowUp in --nvidia, down=ArrowDown in --error. Used in the dashboard overview and analytics tabs.",
+
+    "Step 7 — Overwrite frontend/src/components/AIStatus.jsx (reskin in place — WorkspaceHub imports this as AIStatus). Keep ALL logic (reads workflow from useAnalysis, maps agent states, renders progress bar). Change visual: replace glass/card blue background with var(--surface) + var(--border). Progress bar fill: var(--nvidia) when 100%, otherwise linear-gradient(90deg, var(--nvidia-dim), var(--nvidia)). Agent state icon colors: Completed=var(--nvidia), Running=var(--warning), Failed=var(--error), Ready=var(--info), default=var(--text-3). Section header: use Bot icon (replace Sparkles) in var(--nvidia). Keep the title 'AI Agent Workflow'.",
+
+    "Step 8 — Overwrite frontend/src/components/MetricCard.jsx (reskin in place). Keep all logic (useNavigate, hover state, onClick/to props). Change: background var(--surface), hover background var(--surface-2), border var(--border), hover border uses the color prop. value font uses --font-mono. ArrowUpRight icon uses color prop. Remove box-shadow glow, replace with subtle 0 2px 8px rgba(0,0,0,0.4). border-radius var(--radius).",
+
+    "Step 9 — Overwrite frontend/src/components/DependencyGraph.jsx (reskin in place). Keep all SVG logic (nodes, edges, activeNode). Change: outer container background var(--surface) border var(--border). Node rect fill var(--surface-2) → active fill var(--surface-3), stroke uses node.color (retain). Edge stroke inactive rgba(255,255,255,0.1), highlighted var(--nvidia). Text fill var(--text). Empty state icon color var(--nvidia). Remove #111827 hardcoded colors.",
+
+    "Step 10 — Overwrite frontend/src/components/ReviewCard.jsx (reskin in place). Same props (title, value, color). Change: background var(--surface), border 1px solid var(--border), border-radius var(--radius), padding 16px. Title in --text-2 12px uppercase. Value in 24px bold color prop. Remove .card class reliance — use direct styles.",
+
+    "Step 11 — Overwrite frontend/src/components/MarkdownView.jsx (reskin in place). Keep all parsing logic. Change: h1/h2/h3 colors to var(--text), var(--text-2), var(--text-2). Bullet indicator color var(--nvidia). Numbered list indicator color var(--nvidia). Paragraph color var(--text-2). Bold text color var(--text)."
+  ],
+  "acceptance_criteria": [
+    "npm run build exits 0 after FEAT-002 is applied",
+    "IntelligenceCore.jsx exists and renders without Three.js imports",
+    "AgentCard.jsx, ImpactFileList.jsx, PipelineStatus.jsx, StatCard.jsx are all new files that export default components",
+    "NvidiaStatus.jsx never renders any string containing 'KEY', 'key', 'SECRET', or 'TOKEN' from env vars",
+    "All reskinned components (AIStatus, MetricCard, DependencyGraph, ReviewCard, MarkdownView) use var(--nvidia) instead of #6366f1/#818CF8 for primary accent"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\Kethan Kumar Yanapu\\OneDrive\\Desktop\\Code-Impact-Analysis-update-full-codebase-sync\\Code-Impact-Analysis-update-full-codebase-sync\\frontend' && npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,11 @@
+{
+  "name": "code-impact-analysis",
+  "version": "1.0.0",
+  "description": "Code Impact Analysis & AI Pre-Review Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "python": ".venv\\Scripts\\uvicorn app.main:app --port 8000 --app-dir Code-Impact-Analysis-agent-review/Code-Impact-Analysis-agent-review"
+  }
+}

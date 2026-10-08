@@ -1,0 +1,7 @@
+{
+  "task_id": "task-frontend-redesign",
+  "task_description": "Extreme frontend redesign of ImpactIQ: replace purple/glassmorphism theme with NVIDIA-inspired graphite+green, build new shell components (Topbar, NvidiaStatus, IntelligenceCore, AgentCard, ImpactFileList, PipelineStatus, StatCard), reskin all WorkspaceHub tabs and auth pages — preserving 100% of existing state/API/Socket logic.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

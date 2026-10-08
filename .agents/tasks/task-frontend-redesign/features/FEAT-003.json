@@ -1,0 +1,51 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Reskin all WorkspaceHub tabs and auth pages. Depends on FEAT-001 (tokens) and FEAT-002 (new components). WorkspaceHub.jsx visual overhaul: integrate IntelligenceCore, AgentCard, ImpactFileList, PipelineStatus, StatCard into the appropriate tabs. Replace hardcoded color values (#1F2937, #818CF8, rgba(79,70,229,...), etc.) with CSS token vars. Reskin Login, Register, ForgotPassword to centered single-column dark forms. Run build and fix ALL errors.",
+  "status": "pending",
+  "steps": [
+    "Step 1 — Reskin WorkspaceHub.jsx header banner. Replace the .hero-panel div (which uses the old gradient background) with a flat header bar: background var(--surface), border-bottom 1px solid var(--border), padding 16px 24px. Remove the animated border-color classes. Replace the stat-chip sync indicator colors: syncing→var(--warning), live→var(--nvidia). Replace repo <select> styles: background var(--surface-2), border var(--border), color var(--text), border-radius var(--radius). Replace inline hardcoded grays (#1F2937→var(--surface-2), #0b1329→var(--bg), rgba(15,23,42,*)→var(--surface), rgba(255,255,255,0.08)→var(--border), #94A3B8→var(--text-2), #E2E8F0→var(--text), #FFFFFF→var(--text), #CBD5E1→var(--text-2)). Replace .primary-btn active color from gradient indigo to var(--nvidia) background with #000 text. Replace .secondary-btn to use var(--surface-2) background var(--border) border.",
+
+    "Step 2 — Reskin WorkspaceHub TAB 1 (overview). Replace MetricCard color props: first card '#22C55E'→var(--nvidia) string literal, second '#4F46E5'→var(--info), third '#F59E0B'→var(--warning), fourth '#38BDF8'→var(--info). Replace AIStatus panel wrapper styles. Replace history table header/row border colors. Replace preset button active state '#4F46E5'→var(--nvidia). Add IntelligenceCore between the requirement snapshot card and file indexer card (import IntelligenceCore from '../components/IntelligenceCore'). Replace navigate buttons colors.",
+
+    "Step 3 — Reskin WorkspaceHub TAB 2 (files). Replace filter button active background '#4F46E5'→var(--nvidia). Replace search input wrapper border. Replace file table module badge and action button colors. Replace code viewer panel background '#0b1329'→var(--bg) and pre color '#C7D2FE'→var(--text-2). Replace status banner colors. Replace modal overlay background.",
+
+    "Step 4 — Reskin WorkspaceHub TAB 3 (requirement). Replace preset button active '#4F46E5'→var(--nvidia). Replace Story ID input styles to use var(--surface-2)/var(--border). Replace doc upload drag zone active border color. Replace textarea background '#1F2937'→var(--surface-2) border rgba(255,255,255,0.1)→var(--border). Replace Analyze button gradient→background var(--nvidia) color #000. Add a small context card showing: NVIDIA NIM chip (import NvidiaStatus) so users see the AI provider before running analysis.",
+
+    "Step 5 — Reskin WorkspaceHub TAB 4 (impact). Import ImpactFileList from '../components/ImpactFileList'. Replace <ImpactTable files={analysisData?.impactedFiles} /> with <ImpactFileList files={analysisData?.impactedFiles} />. Replace the 4 stat mini-cards inline styles: #22C55E→var(--nvidia), #4F46E5→var(--info), #F59E0B→var(--warning). Replace advisory primer card border color. Replace DependencyGraph wrapper card styles.",
+
+    "Step 6 — Reskin WorkspaceHub TAB 5 (review). Replace ReviewCard color props: qualityScore '#22C55E'→var(--nvidia), regressionRisk '#F59E0B'→var(--warning), testGaps '#818CF8'→var(--info), securityClearance '#22C55E'→var(--nvidia). Replace git diff textarea: background var(--bg), color var(--nvidia) (green diff text), border var(--border), font-family var(--font-mono). Replace Run Pre-Review button. Replace review report card border-color with var(--nvidia) at 30% opacity. Replace Loader wrapper styles.",
+
+    "Step 7 — Reskin WorkspaceHub TAB 6 (pr). Import PipelineStatus from '../components/PipelineStatus'. Add <PipelineStatus /> above the PR title card. Replace readonly input/textarea: background var(--surface-2), border var(--border), font-family var(--font-mono). Replace Copy/Export/Publish button styles. Publish button background: var(--nvidia) color #000.",
+
+    "Step 8 — Reskin WorkspaceHub TAB 7 (agents). Import AgentCard from '../components/AgentCard'. Import IntelligenceCore from '../components/IntelligenceCore'. Layout: left column gets IntelligenceCore at top, then 5 AgentCard instances (one per AGENTS_LIST entry). Map AGENTS_LIST to AgentCard props: name=agent.name, state=workflow[agentKey] where agentKey maps coord→coordinator, req→requirement, impact→impact, review→review, pr→pr; description=agent.role, model=agent.model, isActive=workflow[key]==='Running'. Remove the old inline agent card divs. Keep the right column AIStatus panel.",
+
+    "Step 9 — Reskin WorkspaceHub TAB 8 (analytics). Replace hotspot card hardcoded background '#1F2937'→var(--surface-2), border colors. Replace metric bar colors: #38BDF8→var(--info), #818CF8→var(--info), #22C55E→var(--nvidia), #F59E0B→var(--warning).",
+
+    "Step 10 — Reskin WorkspaceHub TAB 9 (settings). Add an NVIDIA NIM panel card (after the AI config card, before integrations) showing: NvidiaStatus component + model string + status 'Connected'. Do NOT show any API key. The model display comes from import.meta.env.VITE_NVIDIA_MODEL or fallback. Replace form input/select/label styles using CSS token vars.",
+
+    "Step 11 — Reskin WorkspaceHub modals (Add File Modal, Batch Modal). Replace modal overlay rgba(2,6,23,0.75)→rgba(0,0,0,0.8). Replace modal card styles. Replace input/select styles in modals. Replace Save/Cancel button styles.",
+
+    "Step 12 — Reskin frontend/src/pages/Login.jsx. REMOVE the two-column layout entirely. Replace with a single centered column (max-width:440px, margin:auto). Top: ImpactIQ logotype in monospace (same as Topbar — 'Impact' + 'IQ' in --nvidia). Subtitle: 'Powered by NVIDIA NIM' in --text-3 12px. Form card: background var(--surface), border 1px solid var(--border), border-radius var(--radius-lg), padding 32px. Email/password inputs: background var(--bg), border var(--border), border-radius var(--radius), color var(--text). Submit button: background var(--nvidia), color #000, border-radius var(--radius), padding 12px, font-weight:700. Error banner: background rgba(204,51,51,0.12), border var(--error) at 40%, color var(--error). Forgot password link: color var(--nvidia). Register link: color var(--nvidia). Remove ALL left panel markup, feature highlight grid, metrics strip, shimmer-text class, animated-border class, gradient box-shadow references. Keep all form logic (handleSubmit, email/password state, showPassword toggle, useAuth hook usage) completely intact.",
+
+    "Step 13 — Reskin frontend/src/pages/Register.jsx. Same approach as Login: single column max-width:440px centered card. ImpactIQ logo + 'Powered by NVIDIA NIM'. Step 1 form (name/email/password/role): graphite card, green CTA. Step 2 OTP: same card, 6 OTP digit inputs reskinned (background var(--bg), border var(--border-2), color var(--text), focused border var(--nvidia)). Keep ALL multi-step logic (requestOtp, verifyAndCreateAccount, otpInputRefs, countdown timer, resend) untouched. Remove any decorative purple/indigo gradient elements.",
+
+    "Step 14 — Reskin frontend/src/pages/ForgotPassword.jsx. Single centered column, same card style. Three steps: request email → OTP verify → success. Keep ALL step logic (sendForgotPasswordOtp, resetPasswordWithOtp, otpInputRefs, countdown, step state). Replace button/input/link colors with graphite+green tokens.",
+
+    "Step 15 — Run npm run build. Fix ALL compilation errors before marking this FEAT complete. Common failure patterns to watch for: (a) import of NvidiaStatus/IntelligenceCore/AgentCard/ImpactFileList/PipelineStatus/StatCard with wrong relative path — verify against actual file locations. (b) Topbar import in WorkspaceHub: '../components/Topbar' must exist. (c) Any JSX syntax error from inline style edits. (d) Missing closing tags. Re-run build after each fix until exit code 0."
+  ],
+  "acceptance_criteria": [
+    "npm run build exits with code 0 and zero errors",
+    "Login.jsx is single-column with no left panel or shimmer-text class",
+    "WorkspaceHub agents tab renders 5 AgentCard components and IntelligenceCore",
+    "WorkspaceHub impact tab renders ImpactFileList (not ImpactTable) for the file registry",
+    "WorkspaceHub pr tab renders PipelineStatus above the PR title card",
+    "WorkspaceHub settings tab shows NVIDIA NIM panel with no API key visible",
+    "No hardcoded #6366f1, #818CF8, #8b5cf6, #ec4899, #06b6d4 color values remain in WorkspaceHub.jsx or auth pages (replaced with CSS var tokens)"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\Kethan Kumar Yanapu\\OneDrive\\Desktop\\Code-Impact-Analysis-update-full-codebase-sync\\Code-Impact-Analysis-update-full-codebase-sync\\frontend' && npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

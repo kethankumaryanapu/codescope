@@ -191,7 +191,7 @@ ${report.downstream_risk_assessment || 'No critical downstream risks detected.'}
         - **Existing Tests to Update**: (relevant test suites)
         `;
 
-        const nvidiaModel = process.env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct';
+        const nvidiaModel = process.env.NVIDIA_MODEL || 'nvidia/llama-3.1-nemotron-70b-instruct';
         const response = await ai.chat.completions.create({
           model: nvidiaModel,
           messages: [{ role: 'user', content: prompt }],
@@ -355,7 +355,7 @@ ${(pythonResult.comments || []).map(c => `
       4. **Draft PR Description**: A clean summary (What Changed, Why, Files Touched, Linked ID).
       `;
 
-      const nvidiaModel = process.env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct';
+      const nvidiaModel = process.env.NVIDIA_MODEL || 'nvidia/llama-3.1-nemotron-70b-instruct';
       const response = await ai.chat.completions.create({
         model: nvidiaModel,
         messages: [{ role: 'user', content: prompt }],

@@ -1,0 +1,29 @@
+{
+  "id": "FEAT-001",
+  "type": "refactor",
+  "description": "Replace the purple/indigo/pink/cyan theme with the NVIDIA graphite+green design system. Overwrite index.css with the new design tokens, remove AnimatedBackground from App.jsx, replace Navbar.jsx with the new Topbar (48px), and replace Sidebar.jsx with the new icon-only 56px rail. These three files are the shell that every other page uses — getting them right first means FEAT-002 and FEAT-003 see the correct token names immediately. FEAT-002 is independent of FEAT-001 only if the tokens are set here first; therefore FEAT-001 must land before FEAT-002.",
+  "status": "pending",
+  "steps": [
+    "Step 1 — Overwrite frontend/src/index.css. Replace ALL existing rules. New :root must define exactly these tokens: --bg:#0a0a0a --bg-2:#0f0f0f --surface:#141414 --surface-2:#1a1a1a --surface-3:#202020 --border:#2a2a2a --border-2:#333333 --text:#f0f0f0 --text-2:#a0a0a0 --text-3:#606060 --nvidia:#76b900 --nvidia-dim:#4a7500 --nvidia-glow:rgba(118,185,0,0.15) --success:#76b900 --warning:#e67e00 --error:#cc3333 --info:#4a9eff --accent:#76b900 --radius-sm:4px --radius:6px --radius-lg:10px --font-mono:'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace. Body: background solid #0a0a0a (no gradient), font Inter. Remove ALL aurora-orb, orb-*, floating-code-pill, shimmer-text, animated-border, neonPulse, borderGlow, textShimmer CSS. Rewrite .card, .glass, .primary-btn, .secondary-btn, .dashboard-shell, .metric-grid etc. using the new dark graphite tokens. Keep .spin/@keyframes spin. Add @keyframes nvidiaPulse (green pulse for running agent nodes). Add scrollbar CSS using --surface-2/--nvidia. Add font-face hint for JetBrains Mono from Google Fonts import.",
+
+    "Step 2 — Overwrite frontend/src/App.jsx. Remove the AnimatedBackground import and its JSX. Keep AuthProvider, AnalysisProvider, and AppRoutes. The outer div should simply be: background var(--bg), min-height 100vh, no position:relative/zIndex wrapper needed.",
+
+    "Step 3 — Overwrite frontend/src/components/Topbar.jsx (NEW FILE). Dark topbar, height 48px, position sticky top:0, z-index:100, background var(--surface), border-bottom 1px solid var(--border). Left section: ImpactIQ logotype (monospace font, 'Impact' in --text, 'IQ' in --nvidia, small green square icon). Center section: repo selector <select> from useAnalysis().repositories / selectedRepo / setSelectedRepo — same logic as the existing selector in WorkspaceHub header. Right section: NvidiaStatus component (imported, see FEAT-002) + user avatar circle (first letter of user.name from useAuth()) with a click dropdown for Settings link and Logout button. The dropdown uses useAuth().logout() and useNavigate('/login'). Import: useAnalysis, useAuth, useNavigate, Link from react-router-dom, NvidiaStatus (path: ../components/NvidiaStatus — forward ref that it will exist after FEAT-002). Because NvidiaStatus is in FEAT-002, use a conditional: import NvidiaStatus dynamically with React.lazy or simply import it normally and stub it with a placeholder div if needed at build time — the cleaner approach is to create a tiny NvidiaStatus stub in this step and replace it in FEAT-002. Decision: create NvidiaStatus.jsx in this step as a stub (green dot + 'NVIDIA NIM' text) and FEAT-002 will expand it.",
+
+    "Step 4 — Overwrite frontend/src/components/Sidebar.jsx. Width 56px, icon-only rail. background var(--surface), border-right 1px solid var(--border), height calc(100vh - 48px) (topbar is now 48px not 72px). Each nav item: NavLink with tooltip (title attribute) showing the label on hover. Active state: thin 3px left border in var(--nvidia) + icon color var(--nvidia). Inactive: icon color var(--text-3). Icons from lucide-react: LayoutDashboard(/dashboard), FolderCode(/files), FileText(/requirements), Zap(/impact-analysis), Bot(/agents), Code2(/code-review), GitPullRequest(/pr-generator), BarChart3(/analytics), Settings(/settings). LogOut icon at the bottom (calls useAuth().logout() then navigate('/login')). Remove the 'AI WORKSPACE' banner and status blurb.",
+
+    "Step 5 — Update frontend/src/pages/WorkspaceHub.jsx to use Topbar instead of Navbar. At the top of the return statement, replace <Navbar /> with <Topbar /> (update the import line from '../components/Navbar' to '../components/Topbar'). The outer layout div must set padding-top:0 (Topbar handles itself as sticky). The dashboard-shell must have marginLeft:0 (Sidebar is still part of the shell). Update the inline dashboard-shell style so minHeight is calc(100vh - 48px) instead of calc(100vh - 72px) everywhere it appears. Do NOT touch any logic, state, API calls, context destructuring, or handler functions."
+  ],
+  "acceptance_criteria": [
+    "npm run build exits 0 after FEAT-001 is applied",
+    "index.css contains --nvidia:#76b900 and no references to #6366f1, #ec4899, #8b5cf6 in :root",
+    "App.jsx does not import AnimatedBackground",
+    "Topbar.jsx renders the ImpactIQ logo, repo selector, and user avatar in a 48px bar",
+    "Sidebar.jsx is icon-only at 56px width with green active indicator"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\Kethan Kumar Yanapu\\OneDrive\\Desktop\\Code-Impact-Analysis-update-full-codebase-sync\\Code-Impact-Analysis-update-full-codebase-sync\\frontend' && npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
