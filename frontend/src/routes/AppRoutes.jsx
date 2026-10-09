@@ -11,6 +11,7 @@ import CodebaseFiles from "../pages/CodebaseFiles";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
+import IntelligenceHub from "../pages/IntelligenceHub";
 import AppShell from "../components/AppShell";
 import { useAuth } from "../context/AuthContext";
 
@@ -20,14 +21,20 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Root redirect */}
-      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/hub" /> : <Navigate to="/login" />} />
 
       {/* Public routes — no AppLayout */}
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
-      <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
+      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/hub" />} />
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/hub" />} />
+      <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/hub" />} />
 
-      {/* Authenticated routes — wrapped in AppLayout */}
+      {/* Intelligence Hub — authenticated home */}
+      <Route
+        path="/hub"
+        element={isAuthenticated ? <AppShell><IntelligenceHub /></AppShell> : <Navigate to="/login" />}
+      />
+
+      {/* Authenticated routes — wrapped in AppShell */}
       <Route
         path="/dashboard"
         element={isAuthenticated ? <AppShell><Dashboard /></AppShell> : <Navigate to="/login" />}
@@ -66,7 +73,7 @@ const AppRoutes = () => {
       />
 
       {/* Fallback */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+      <Route path="*" element={<Navigate to={isAuthenticated ? "/hub" : "/login"} />} />
     </Routes>
   );
 };
