@@ -5,7 +5,7 @@ import path from 'path';
 let repositories = [
   {
     id: 'repo-1',
-    name: 'impactiq-backend',
+    name: 'codescope-backend',
     branch: 'main',
     status: 'Connected',
     repoPath: path.resolve(process.cwd(), '../backend'),
@@ -17,7 +17,7 @@ let repositories = [
   },
   {
     id: 'repo-2',
-    name: 'impactiq-frontend',
+    name: 'codescope-frontend',
     branch: 'main',
     status: 'Connected',
     repoPath: path.resolve(process.cwd(), '../frontend'),

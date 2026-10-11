@@ -9,23 +9,23 @@ const inMemoryUsers = [
   {
     id: 'usr-1',
     name: 'Abhiram Sadgun',
-    email: 'abhiram@impactiq.ai',
+    email: 'abhiram@codescope.ai',
     password: 'password123',
     role: 'Senior Staff Engineer',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
     githubUsername: 'abhiramsadgun94',
-    jiraUsername: 'abhiram@impactiq.ai',
+    jiraUsername: 'abhiram@codescope.ai',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'usr-2',
     name: 'Alex Rivera',
-    email: 'developer@impactiq.ai',
+    email: 'developer@codescope.ai',
     password: 'password123',
     role: 'Full Stack Developer',
     avatar: '',
     githubUsername: 'alexrivera',
-    jiraUsername: 'alex@impactiq.ai',
+    jiraUsername: 'alex@codescope.ai',
     createdAt: new Date().toISOString(),
   },
 ];
@@ -72,25 +72,25 @@ export const handleSendRegistrationOTP = async (req, res) => {
     });
 
     console.log(`\n========================================`);
-    console.log(`🔑 [ImpactIQ Registration OTP]`);
+    console.log(`🔑 [CodeScope Registration OTP]`);
     console.log(`📧 Recipient: ${normalizedEmail}`);
     console.log(`🔢 Code:      ${otp}`);
     console.log(`⏰ Valid for: 10 minutes`);
     console.log(`========================================\n`);
 
     // Dispatch branded HTML email via SMTP / Nodemailer
-    const emailSubject = `ImpactIQ - Your Verification Code: ${otp}`;
+    const emailSubject = `CodeScope - Your Verification Code: ${otp}`;
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #0F172A; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 32px; color: #FFFFFF;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
           <div style="background: linear-gradient(135deg, #6366F1, #8B5CF6); width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: #FFF; text-align: center; line-height: 38px;">
-            IQ
+            CS
           </div>
-          <span style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-left: 10px;">Impact<span style="color: #818CF8;">IQ</span></span>
+          <span style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-left: 10px;">Code<span style="color: #818CF8;">Scope</span></span>
         </div>
         <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px 0; color: #FFFFFF;">Verify Your Email Address</h2>
         <p style="color: #94A3B8; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
-          Hi ${name || 'Developer'}, welcome to ImpactIQ! Enter the 6-digit verification code below to confirm your email and activate your workspace.
+          Hi ${name || 'Developer'}, welcome to CodeScope! Enter the 6-digit verification code below to confirm your email and activate your workspace.
         </p>
         <div style="background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 18px 24px; text-align: center; margin-bottom: 24px;">
           <span style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #818CF8; font-family: monospace;">${otp}</span>
@@ -214,20 +214,20 @@ export const handleForgotPassword = async (req, res) => {
     });
 
     console.log(`\n========================================`);
-    console.log(`🔒 [ImpactIQ Password Reset OTP]`);
+    console.log(`🔒 [CodeScope Password Reset OTP]`);
     console.log(`📧 Recipient: ${normalizedEmail}`);
     console.log(`🔢 Code:      ${otp}`);
     console.log(`⏰ Valid for: 10 minutes`);
     console.log(`========================================\n`);
 
-    const emailSubject = `ImpactIQ - Password Reset Code: ${otp}`;
+    const emailSubject = `CodeScope - Password Reset Code: ${otp}`;
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #0F172A; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 32px; color: #FFFFFF;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
           <div style="background: linear-gradient(135deg, #6366F1, #8B5CF6); width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: #FFF; text-align: center; line-height: 38px;">
-            IQ
+            CS
           </div>
-          <span style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-left: 10px;">Impact<span style="color: #818CF8;">IQ</span></span>
+          <span style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-left: 10px;">Code<span style="color: #818CF8;">Scope</span></span>
         </div>
         <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px 0; color: #FFFFFF;">Password Recovery</h2>
         <p style="color: #94A3B8; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">

@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('impactiq_user');
+    const saved = localStorage.getItem('codescope_user');
     return saved ? JSON.parse(saved) : null;
   });
 
@@ -14,19 +14,19 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const restoreSession = async () => {
-      const token = localStorage.getItem('impactiq_token');
+      const token = localStorage.getItem('codescope_token');
       if (!token) return;
 
       try {
         const data = await fetchCurrentUser();
         if (data?.user) {
           setUser(data.user);
-          localStorage.setItem('impactiq_user', JSON.stringify(data.user));
+          localStorage.setItem('codescope_user', JSON.stringify(data.user));
         }
       } catch (err) {
         console.warn('Session restore failed:', err.message);
-        localStorage.removeItem('impactiq_user');
-        localStorage.removeItem('impactiq_token');
+        localStorage.removeItem('codescope_user');
+        localStorage.removeItem('codescope_token');
         setUser(null);
       }
     };
@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await loginUser(email, password);
       setUser(data.user);
-      localStorage.setItem('impactiq_user', JSON.stringify(data.user));
-      localStorage.setItem('impactiq_token', data.token);
+      localStorage.setItem('codescope_user', JSON.stringify(data.user));
+      localStorage.setItem('codescope_token', data.token);
       return data.user;
     } catch (err) {
       setAuthError(err.message || 'Login failed');
@@ -71,8 +71,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await verifyAndRegister({ name, email, password, role, otp });
       setUser(data.user);
-      localStorage.setItem('impactiq_user', JSON.stringify(data.user));
-      localStorage.setItem('impactiq_token', data.token);
+      localStorage.setItem('codescope_user', JSON.stringify(data.user));
+      localStorage.setItem('codescope_token', data.token);
       return data.user;
     } catch (err) {
       setAuthError(err.message || 'Verification failed');
@@ -88,8 +88,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await registerUser(name, email, password, role);
       setUser(data.user);
-      localStorage.setItem('impactiq_user', JSON.stringify(data.user));
-      localStorage.setItem('impactiq_token', data.token);
+      localStorage.setItem('codescope_user', JSON.stringify(data.user));
+      localStorage.setItem('codescope_token', data.token);
       return data.user;
     } catch (err) {
       setAuthError(err.message || 'Registration failed');
@@ -101,8 +101,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('impactiq_user');
-    localStorage.removeItem('impactiq_token');
+    localStorage.removeItem('codescope_user');
+    localStorage.removeItem('codescope_token');
   };
 
   return (

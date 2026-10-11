@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useMemo, useCallback } from 'react
 
 const SidebarContext = createContext(null);
 
-const STORAGE_KEY = 'impactiq_sidebar_expanded';
+const STORAGE_KEY = 'codescope_sidebar_expanded';
 
 export const SidebarProvider = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(() => {

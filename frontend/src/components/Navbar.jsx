@@ -36,7 +36,7 @@ const Navbar = () => {
               <Sparkles size={18} color="#fff" />
             </div>
             <h2 style={{ color: "#fff", fontWeight: "700", margin: 0, fontSize: "20px" }}>
-              Impact<span style={{ color: "#818CF8" }}>IQ</span>
+              Code<span style={{ color: "#818CF8" }}>Scope</span>
             </h2>
           </div>
         </Link>
@@ -71,7 +71,7 @@ const Navbar = () => {
               <div style={{ position: "absolute", right: 0, top: "52px", width: "220px", background: "#111827", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", boxShadow: "0 12px 30px rgba(0,0,0,0.45)", padding: "10px", display: "flex", flexDirection: "column", gap: "6px", zIndex: 200 }}>
                 <div style={{ padding: "8px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                   <p style={{ margin: 0, fontSize: "11px", color: "#9CA3AF" }}>Signed in as</p>
-                  <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#F3F4F6", fontWeight: 600 }}>{user?.email || "developer@impactiq.ai"}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#F3F4F6", fontWeight: 600 }}>{user?.email || "developer@codescope.ai"}</p>
                 </div>
 
                 <Link to="/settings" onClick={() => setDropdownOpen(false)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 10px", borderRadius: "8px", color: "#D1D5DB", fontSize: "13px", textDecoration: "none" }}>

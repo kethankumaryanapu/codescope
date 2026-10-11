@@ -1,7 +1,7 @@
 // Frontend API Services Client
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('impactiq_token');
+  const token = localStorage.getItem('codescope_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 

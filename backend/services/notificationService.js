@@ -68,7 +68,7 @@ export const sendEmailNotification = async (to, subject, htmlBody) => {
   try {
     const transporter = createTransporter();
     const info = await transporter.sendMail({
-      from: `"ImpactIQ" <${process.env.SMTP_USER}>`,
+      from: `"CodeScope" <${process.env.SMTP_USER}>`,
       to,
       subject,
       html: htmlBody,
@@ -83,7 +83,7 @@ export const sendEmailNotification = async (to, subject, htmlBody) => {
 
 /** Impact analysis complete email */
 export const emailImpactComplete = (userName, requirementId, impactedCount, summaryMarkdown) => ({
-  subject: `[ImpactIQ] Impact Analysis Ready — ${requirementId}`,
+  subject: `[CodeScope] Impact Analysis Ready — ${requirementId}`,
   html: `
     <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px;">
       <h2 style="color:#818cf8;"> Impact Analysis Complete</h2>
@@ -100,13 +100,13 @@ export const emailImpactComplete = (userName, requirementId, impactedCount, summ
         </tr>
       </table>
       <pre style="background:#1e293b;padding:16px;border-radius:8px;font-size:13px;white-space:pre-wrap;">${summaryMarkdown}</pre>
-      <p style="color:#64748b;font-size:12px;margin-top:24px;">ImpactIQ • Code Intelligence Platform</p>
+      <p style="color:#64748b;font-size:12px;margin-top:24px;">CodeScope • Code Intelligence Platform</p>
     </div>`,
 });
 
 /** Pre-review complete email */
 export const emailPreReviewComplete = (userName, requirementId, qualityScore, regressionRisk) => ({
-  subject: `[ImpactIQ] Pre-Review Ready — ${requirementId}`,
+  subject: `[CodeScope] Pre-Review Ready — ${requirementId}`,
   html: `
     <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px;">
       <h2 style="color:#818cf8;"> Pre-Review Analysis Complete</h2>
@@ -122,7 +122,7 @@ export const emailPreReviewComplete = (userName, requirementId, qualityScore, re
           <td style="padding:8px;color:#f59e0b;font-weight:bold;">${regressionRisk}</td>
         </tr>
       </table>
-      <p style="color:#64748b;font-size:12px;margin-top:24px;">ImpactIQ • Code Intelligence Platform</p>
+      <p style="color:#64748b;font-size:12px;margin-top:24px;">CodeScope • Code Intelligence Platform</p>
     </div>`,
 });
 
@@ -163,7 +163,7 @@ export const emailPushAlertToOwner = (ownerName, data) => {
     </div>`;
 
   return {
-    subject: `🚀 [ImpactIQ Alert] New Push to ${repoFullName} (${branch}) by @${pusher.username || 'collaborator'}`,
+    subject: `🚀 [CodeScope Alert] New Push to ${repoFullName} (${branch}) by @${pusher.username || 'collaborator'}`,
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:auto;background:#090d16;color:#e2e8f0;padding:32px;border-radius:12px;border:1px solid #1e293b;">
         <div style="display:flex;align-items:center;margin-bottom:20px;">
@@ -218,7 +218,7 @@ export const emailPushAlertToOwner = (ownerName, data) => {
 
         <hr style="border:none;border-top:1px solid #1e293b;margin:28px 0 16px 0;"/>
         <p style="color:#64748b;font-size:11px;margin:0;">
-          ImpactIQ Webhook System • Automatic Real-Time Alert • ${timestamp}
+          CodeScope Webhook System • Automatic Real-Time Alert • ${timestamp}
         </p>
       </div>`,
   };
@@ -251,7 +251,7 @@ export const emailPullRequestAlertToOwner = (ownerName, data) => {
     : `<span style="background:#1e1b4b;color:#818cf8;padding:4px 8px;border-radius:4px;font-weight:bold;">${action} 🔵</span>`;
 
   return {
-    subject: `🔔 [ImpactIQ Alert] PR #${prNumber} ${action.toUpperCase()}: "${prTitle}" on ${repoFullName}`,
+    subject: `🔔 [CodeScope Alert] PR #${prNumber} ${action.toUpperCase()}: "${prTitle}" on ${repoFullName}`,
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:auto;background:#090d16;color:#e2e8f0;padding:32px;border-radius:12px;border:1px solid #1e293b;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -308,7 +308,7 @@ export const emailPullRequestAlertToOwner = (ownerName, data) => {
 
         <hr style="border:none;border-top:1px solid #1e293b;margin:28px 0 16px 0;"/>
         <p style="color:#64748b;font-size:11px;margin:0;">
-          ImpactIQ Webhook System • Automatic Real-Time Alert • ${timestamp}
+          CodeScope Webhook System • Automatic Real-Time Alert • ${timestamp}
         </p>
       </div>`,
   };
@@ -426,7 +426,7 @@ export const postGitHubPRComment = async (owner, repo, prNumber, body) => {
 
 /** Formats the AI pre-review as a clean GitHub PR comment */
 export const formatPRComment = (requirementId, qualityScore, regressionRisk, reviewMarkdown) => `
-## 🤖 ImpactIQ — Automated Pre-Review
+## 🤖 CodeScope — Automated Pre-Review
 
 | Field | Value |
 |---|---|
@@ -440,7 +440,7 @@ export const formatPRComment = (requirementId, qualityScore, regressionRisk, rev
 ${reviewMarkdown}
 
 ---
-*Generated by [ImpactIQ](https://impactiq.dev) — AI Code Intelligence Platform*
+*Generated by [CodeScope](https://codescope.ai) — AI Code Intelligence Platform*
 `;
 
 // ─── 4. IN-APP REAL-TIME (Socket.io) ─────────────────────────────────────────

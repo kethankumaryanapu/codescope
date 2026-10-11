@@ -111,7 +111,7 @@ const fetchGitHubOwnerEmail = async (ownerLogin, repoFullName) => {
     Authorization: `Bearer ${token}`,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'ImpactIQ-Code-Intelligence',
+    'User-Agent': 'CodeScope-Code-Intelligence',
   };
 
   try {
@@ -153,7 +153,7 @@ const fetchGitHubOwnerEmail = async (ownerLogin, repoFullName) => {
  * Priority order:
  *  1. Webhook payload repository owner email (if provided directly by GitHub)
  *  2. Webhook payload pusher / commit author email IF pusher/author is the owner
- *  3. ImpactIQ MongoDB User collection matching githubUsername
+ *  3. CodeScope MongoDB User collection matching githubUsername
  *  4. System registered users in memory matching githubUsername
  *  5. Connected repository registry config matching repo name/id (ownerEmail)
  *  6. GitHub REST API query (profile or repository commits authored by owner)
@@ -218,7 +218,7 @@ export const resolveRepoOwner = async (repoOwnerLogin, payload = {}) => {
     }
   }
 
-  // 4. Check ImpactIQ database: MongoDB User matching githubUsername
+  // 4. Check CodeScope database: MongoDB User matching githubUsername
   if (mongoose.connection?.readyState === 1) {
     try {
       const dbUser = await User.findOne(
@@ -226,7 +226,7 @@ export const resolveRepoOwner = async (repoOwnerLogin, payload = {}) => {
         { email: 1, name: 1, githubUsername: 1 }
       );
       if (dbUser?.email) {
-        console.log(`[Webhook] ✅ Resolved Repo Owner from ImpactIQ DB @${ownerLogin} → ${dbUser.email}`);
+        console.log(`[Webhook] ✅ Resolved Repo Owner from CodeScope DB @${ownerLogin} → ${dbUser.email}`);
         return { email: dbUser.email, name: dbUser.name || ownerLogin, login: ownerLogin };
       }
     } catch (err) {
@@ -967,10 +967,10 @@ export const handleStripeWebhook = async (req, res) => {
     if (customerEmail) {
       await sendEmailNotification(
         customerEmail,
-        `[ImpactIQ] Payment Confirmation — $${amount} ${currency}`,
+        `[CodeScope] Payment Confirmation — $${amount} ${currency}`,
         `<div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:12px;">
           <h2 style="color:#22c55e;"> Payment Successful</h2>
-          <p>Thank you for subscribing to ImpactIQ!</p>
+          <p>Thank you for subscribing to CodeScope!</p>
           <p>Amount: <strong>$${amount} ${currency}</strong></p>
           <p>Payment ID: <code>${dataObject.id}</code></p>
         </div>`
