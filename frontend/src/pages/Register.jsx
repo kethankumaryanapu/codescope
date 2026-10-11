@@ -34,7 +34,7 @@ const Register = () => {
 
     try {
       await register(name.trim(), email.trim(), password, role);
-      navigate('/dashboard');
+      navigate('/hub');
     } catch (err) {
       setLocalError(err.message || 'Registration failed. Please try again.');
     }
@@ -46,20 +46,34 @@ const Register = () => {
     <div className="auth-page">
       {/* ── Left panel ── */}
       <div className="auth-left">
-        <div className="auth-left-bg" />
-        <div className="auth-left-overlay" />
+        <div className="auth-left-divider" aria-hidden="true" />
         <div className="auth-left-content">
-          <div className="auth-logomark">IQ</div>
+          <img src="/codescope-logo.png" alt="CodeScope" className="auth-logo-img" />
           <div className="auth-wordmark">
-            <span className="auth-wordmark-impact">Impact</span>
-            <span className="auth-wordmark-iq">IQ</span>
+            <span className="auth-wordmark-impact">Code</span>
+            <span className="auth-wordmark-iq">Scope</span>
           </div>
+          <div className="auth-left-rule" aria-hidden="true" />
+          <h2 className="auth-heading">
+            AI-powered code intelligence for complex software systems.
+          </h2>
           <p className="auth-tagline">
-            AI-powered code intelligence for understanding, analyzing and delivering complex software changes.
+            Understand change impact, coordinate intelligent analysis, and review code with confidence.
           </p>
         </div>
-        <div className="auth-attribution">
-          Built on NVIDIA NIM · Llama 3.1 70B
+        <div className="auth-features" aria-hidden="true">
+          <div className="auth-feature-item">
+            <span className="auth-feature-dot" />
+            Semantic codebase indexing
+          </div>
+          <div className="auth-feature-item">
+            <span className="auth-feature-dot" />
+            AI-driven impact analysis
+          </div>
+          <div className="auth-feature-item">
+            <span className="auth-feature-dot" />
+            Automated pre-review &amp; PR generation
+          </div>
         </div>
       </div>
 
@@ -67,7 +81,7 @@ const Register = () => {
       <div className="auth-right">
         <div className="auth-card">
           <h2 className="auth-card-title">Create account</h2>
-          <p className="auth-card-subtitle">Get started with ImpactIQ</p>
+          <p className="auth-card-subtitle">Get started with CodeScope</p>
 
           {displayedError && (
             <div className="auth-error">

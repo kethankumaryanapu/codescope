@@ -46,19 +46,10 @@
   margin-bottom: 4px;
 }
 
-.ih-logo-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #76b900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: -0.5px;
+.ih-logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -71,7 +62,17 @@
 }
 
 .ih-logo-accent {
-  color: #76b900;
+  color: #00c8a0;
+}
+
+.ih-hero-subtitle-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #00c8a0;
+  font-family: var(--font-mono);
+  margin: 0;
 }
 
 .ih-hero-title {

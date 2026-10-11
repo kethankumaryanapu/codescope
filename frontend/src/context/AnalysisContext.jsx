@@ -36,8 +36,8 @@ index 83a1b2c..94d2e3f 100644
  };`;
 
 const INITIAL_REPOSITORIES = [
-  { id: 'repo-1', name: 'impactiq-backend', branch: 'main', status: 'Connected', filesCount: 12, coverage: '91%' },
-  { id: 'repo-2', name: 'impactiq-frontend', branch: 'main', status: 'Connected', filesCount: 18, coverage: '88%' },
+  { id: 'repo-1', name: 'codescope-backend', branch: 'main', status: 'Connected', filesCount: 12, coverage: '91%' },
+  { id: 'repo-2', name: 'codescope-frontend', branch: 'main', status: 'Connected', filesCount: 18, coverage: '88%' },
   { id: 'repo-3', name: 'payment-gateway', branch: 'feat/stripe-v2', status: 'Connected', filesCount: 19, coverage: '94%' },
 ];
 

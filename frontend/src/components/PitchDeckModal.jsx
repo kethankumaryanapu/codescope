@@ -19,7 +19,7 @@ const SLIDES = [
   {
     id: 1,
     tag: "OVERVIEW",
-    title: "ImpactIQ",
+    title: "CodeScope",
     subtitle: "AI-Powered Code Impact Analysis & Pre-Review Platform",
     accent: "#6366F1",
     content: (
@@ -186,7 +186,7 @@ const SLIDES = [
   {
     id: 3,
     tag: "SOLUTION & ARCHITECTURE",
-    title: "The ImpactIQ Multi-Agent Solution",
+    title: "The CodeScope Multi-Agent Solution",
     subtitle: "Deterministic AST Parsing combined with Semantic LLM Reasoning",
     accent: "#06B6D4",
     content: (

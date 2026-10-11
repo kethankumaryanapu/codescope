@@ -1,39 +1,10 @@
-import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, FolderTree, FileText, Bot, Zap,
-  ShieldCheck, GitPullRequest, FolderGit2
+  FolderTree, FileText,
+  ShieldCheck, FolderGit2
 } from 'lucide-react';
 import { useAnalysis } from '../context/AnalysisContext';
 import './IntelligenceHub.css';
-
-const DOMAINS = [
-  {
-    id: 'workspace',
-    label: 'WORKSPACE',
-    modules: [
-      { to: '/dashboard', label: 'Workspace Hub', icon: LayoutDashboard },
-      { to: '/files', label: 'Codebase', icon: FolderTree },
-    ],
-  },
-  {
-    id: 'intelligence',
-    label: 'INTELLIGENCE',
-    modules: [
-      { to: '/requirements', label: 'Requirements', icon: FileText },
-      { to: '/agents', label: 'Agents', icon: Bot },
-      { to: '/impact-analysis', label: 'Impact Analysis', icon: Zap },
-    ],
-  },
-  {
-    id: 'review',
-    label: 'REVIEW & DELIVERY',
-    modules: [
-      { to: '/code-review', label: 'Code Review', icon: ShieldCheck },
-      { to: '/pr-generator', label: 'Pull Request', icon: GitPullRequest },
-    ],
-  },
-];
 
 const ENTRY_CARDS = [
   {
@@ -64,35 +35,22 @@ const IntelligenceHub = () => {
   const location = useLocation();
   const { selectedRepo, repoFiles } = useAnalysis();
 
-  // Determine which domain is active based on current path
-  const activeDomainId = (() => {
-    for (const domain of DOMAINS) {
-      if (domain.modules.some(m => location.pathname === m.to || location.pathname.startsWith(m.to + '/'))) {
-        return domain.id;
-      }
-    }
-    return 'workspace';
-  })();
-
-  const [selectedDomain, setSelectedDomain] = useState(activeDomainId);
-
-  const currentDomain = DOMAINS.find(d => d.id === selectedDomain) || DOMAINS[0];
-
   return (
     <div className="ih-root">
       {/* Hero */}
-      <section className="ih-hero" aria-label="ImpactIQ identity">
+      <section className="ih-hero" aria-label="CodeScope identity">
         <div className="ih-hero-scrim" aria-hidden="true" />
         <div className="ih-hero-content">
           <div className="ih-brand">
-            <div className="ih-logo-mark">IQ</div>
-            <span className="ih-logo-text">Impact<span className="ih-logo-accent">IQ</span></span>
+            <img src="/codescope-logo.png" alt="CodeScope" className="ih-logo-img" />
+            <span className="ih-logo-text">Code<span className="ih-logo-accent">Scope</span></span>
           </div>
+          <p className="ih-hero-subtitle-tag">Multi-Agent Code Intelligence Platform</p>
           <h1 className="ih-hero-title">
-            AI-powered code intelligence for complex software systems.
+            Understand Changes. Predict Impact. Review with Confidence.
           </h1>
           <p className="ih-hero-subtitle">
-            Understand change impact, coordinate intelligent analysis, and review code with confidence.
+            AI-powered code intelligence for complex software systems.
           </p>
           {selectedRepo && (
             <div className="ih-status-line">
@@ -107,37 +65,6 @@ const IntelligenceHub = () => {
           )}
         </div>
       </section>
-
-      {/* Primary domain nav */}
-      <nav className="ih-domain-nav" aria-label="Feature domains">
-        {DOMAINS.map(domain => (
-          <button
-            key={domain.id}
-            className={`ih-domain-btn${selectedDomain === domain.id ? ' active' : ''}`}
-            onClick={() => setSelectedDomain(domain.id)}
-          >
-            {domain.label}
-          </button>
-        ))}
-      </nav>
-
-      {/* Module strip */}
-      <div className="ih-module-strip" role="navigation" aria-label={`${currentDomain.label} modules`}>
-        {currentDomain.modules.map(mod => {
-          const Icon = mod.icon;
-          const isActive = location.pathname === mod.to || location.pathname.startsWith(mod.to + '/');
-          return (
-            <button
-              key={mod.to}
-              className={`ih-module-item${isActive ? ' active' : ''}`}
-              onClick={() => navigate(mod.to)}
-            >
-              <Icon size={15} aria-hidden="true" />
-              <span>{mod.label}</span>
-            </button>
-          );
-        })}
-      </div>
 
       {/* Hub content */}
       <section className="ih-content" aria-label="Hub overview">

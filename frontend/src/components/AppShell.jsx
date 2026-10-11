@@ -1,12 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Settings, LogOut } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link, useLocation, NavLink } from 'react-router-dom';
+import { Settings, LogOut, ChevronDown, Menu, X,
+         LayoutDashboard, FolderTree, FileText, Bot, Zap,
+         ShieldCheck, GitPullRequest } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAnalysis } from '../context/AnalysisContext';
 import NvidiaStatus from './NvidiaStatus';
 import './GlobalBackground.css';
 import './AppShell.css';
 
+/* ── Navigation structure (matches existing routes) ── */
+const NAV_CATEGORIES = [
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    items: [
+      { to: '/dashboard', label: 'Workspace Hub', icon: LayoutDashboard },
+      { to: '/files',     label: 'Codebase',      icon: FolderTree },
+    ],
+  },
+  {
+    id: 'intelligence',
+    label: 'Intelligence',
+    items: [
+      { to: '/requirements',   label: 'Requirements',    icon: FileText },
+      { to: '/agents',         label: 'Agents',          icon: Bot },
+      { to: '/impact-analysis', label: 'Impact Analysis', icon: Zap },
+    ],
+  },
+  {
+    id: 'review',
+    label: 'Review & Delivery',
+    items: [
+      { to: '/code-review',  label: 'Code Review',  icon: ShieldCheck },
+      { to: '/pr-generator', label: 'Pull Request', icon: GitPullRequest },
+    ],
+  },
+];
+
+/* ── Single nav category with dropdown ── */
+const NavCategory = ({ cat, location }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    if (open) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Close on route change
+  useEffect(() => { setOpen(false); }, [location.pathname]);
+
+  const isActive = cat.items.some(
+    (item) => location.pathname === item.to || location.pathname.startsWith(item.to + '/')
+  );
+
+  return (
+    <div className="shell-nav-cat" ref={ref}>
+      <button
+        className={`shell-nav-trigger${isActive ? ' active' : ''}${open ? ' open' : ''}`}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        {cat.label}
+        <ChevronDown size={12} className={`shell-nav-chevron${open ? ' rotated' : ''}`} aria-hidden="true" />
+      </button>
+
+      {open && (
+        <>
+          <div className="shell-nav-backdrop" onClick={() => setOpen(false)} />
+          <div className="shell-nav-dropdown" role="menu">
+            {cat.items.map((item) => {
+              const Icon = item.icon;
+              const itemActive =
+                location.pathname === item.to ||
+                location.pathname.startsWith(item.to + '/');
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={`shell-nav-item${itemActive ? ' active' : ''}`}
+                  role="menuitem"
+                >
+                  <Icon size={14} aria-hidden="true" />
+                  {item.label}
+                </NavLink>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+/* ── App shell ── */
 const AppShell = ({ children }) => {
   const { user, logout } = useAuth();
   const { repositories, selectedRepo, setSelectedRepo } = useAnalysis();
@@ -14,12 +105,13 @@ const AppShell = ({ children }) => {
   const location = useLocation();
 
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'U';
 
-  // Close dropdowns when route changes
   useEffect(() => {
     setUserMenuOpen(false);
+    setMobileNavOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -36,17 +128,24 @@ const AppShell = ({ children }) => {
         <div className="global-bg-vignette" />
       </div>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <header className="shell-header">
         {/* Logo */}
         <Link to="/hub" className="shell-logo">
-          <div className="shell-logo-mark">IQ</div>
+          <img src="/codescope-logo.png" alt="CodeScope" className="shell-logo-img" />
           <span className="shell-logo-text">
-            Impact<span className="shell-logo-accent">IQ</span>
+            Code<span className="shell-logo-accent">Scope</span>
           </span>
         </Link>
 
-        {/* Right side actions */}
+        {/* Primary nav — desktop */}
+        <nav className="shell-nav" aria-label="Primary navigation">
+          {NAV_CATEGORIES.map((cat) => (
+            <NavCategory key={cat.id} cat={cat} location={location} />
+          ))}
+        </nav>
+
+        {/* Right-side actions */}
         <div className="shell-actions">
           {/* Repo selector */}
           {repositories && repositories.length > 0 && (
@@ -70,7 +169,7 @@ const AppShell = ({ children }) => {
           {/* AI Engine status */}
           <NvidiaStatus />
 
-          {/* Settings icon */}
+          {/* Settings */}
           <Link to="/settings" className="shell-action-btn" aria-label="Settings">
             <Settings size={16} />
           </Link>
@@ -79,7 +178,7 @@ const AppShell = ({ children }) => {
           <div style={{ position: 'relative' }}>
             <button
               className="shell-avatar"
-              onClick={() => setUserMenuOpen((prev) => !prev)}
+              onClick={() => setUserMenuOpen((v) => !v)}
               aria-label="User menu"
               aria-expanded={userMenuOpen}
             >
@@ -87,10 +186,7 @@ const AppShell = ({ children }) => {
             </button>
             {userMenuOpen && (
               <>
-                <div
-                  className="shell-dropdown-backdrop"
-                  onClick={() => setUserMenuOpen(false)}
-                />
+                <div className="shell-dropdown-backdrop" onClick={() => setUserMenuOpen(false)} />
                 <div className="shell-user-dropdown">
                   <div className="shell-user-info">
                     <span className="shell-user-label">SIGNED IN AS</span>
@@ -105,18 +201,52 @@ const AppShell = ({ children }) => {
                   >
                     <Settings size={14} /> Settings
                   </Link>
-                  <button
-                    className="shell-dropdown-item danger"
-                    onClick={handleLogout}
-                  >
+                  <button className="shell-dropdown-item danger" onClick={handleLogout}>
                     <LogOut size={14} /> Sign Out
                   </button>
                 </div>
               </>
             )}
           </div>
+
+          {/* Mobile hamburger */}
+          <button
+            className="shell-mobile-menu-btn"
+            onClick={() => setMobileNavOpen((v) => !v)}
+            aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileNavOpen}
+          >
+            {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
       </header>
+
+      {/* Mobile nav drawer */}
+      {mobileNavOpen && (
+        <div className="shell-mobile-nav" role="navigation" aria-label="Mobile navigation">
+          {NAV_CATEGORIES.map((cat) => (
+            <div key={cat.id}>
+              <div className="shell-mobile-cat-label">{cat.label}</div>
+              {cat.items.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  location.pathname === item.to ||
+                  location.pathname.startsWith(item.to + '/');
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={`shell-mobile-item${isActive ? ' active' : ''}`}
+                  >
+                    <Icon size={14} aria-hidden="true" style={{ marginRight: 8, verticalAlign: 'middle' }} />
+                    {item.label}
+                  </NavLink>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Page content */}
       <main className="shell-page-content">{children}</main>

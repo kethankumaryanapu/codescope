@@ -1,6 +1,6 @@
-# ImpactIQ - AI-Powered Code Impact Analysis & Pre-Review Platform
+# CodeScope - AI-Powered Code Impact Analysis & Pre-Review Platform
 
-ImpactIQ is an intelligent developer assistant that analyzes software requirements against codebase structures, generates predictive impact maps, performs automated Senior Staff AI code reviews, and drafts GitHub pull requests using **Google Gemini AI**.
+CodeScope is an intelligent developer assistant that analyzes software requirements against codebase structures, generates predictive impact maps, performs automated Senior Staff AI code reviews, and drafts GitHub pull requests using **Google Gemini AI**.
 
 ---
 

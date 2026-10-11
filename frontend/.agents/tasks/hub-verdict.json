@@ -1,0 +1,8 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    "NVIDIA model string visible in header — NvidiaStatus.jsx renders `nvidia/llama-3.1-nemotron-70b-instruct` as a visible second line in the header pill on every authenticated page. Either remove the model string span, replace it with a generic label (e.g. 'Llama 3.1 70B'), or strip the vendor prefix before display (`MODEL.split('/').pop()`).",
+    "Orphaned nav CSS in AppShell.css — ~80 lines of Phase 1 dropdown nav classes (.shell-nav, .shell-nav-trigger, .shell-nav-dropdown, .shell-mobile-nav, etc.) remain after the dropdown JSX was removed. Remove them."
+  ],
+  "reviewDoc": "c:\\Users\\Kethan Kumar Yanapu\\OneDrive\\Desktop\\ImpactIQ\\ImpactIQ\\frontend\\.agents\\tasks\\hub-review.md"
+}

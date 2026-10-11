@@ -1,0 +1,139 @@
+/* ============================================================
+   GLOBAL BACKGROUND — ImpactIQ tech dashboard watermark
+
+   Z-INDEX ARCHITECTURE
+   ────────────────────
+   -2   .global-bg          base layer (position: fixed, full viewport)
+   -1   .global-bg-img      background image at watermark opacity
+    0   .global-bg-vignette edge-fade overlay blends image into dark app
+    1   .app-shell          document flow
+   10   .sidebar / header   fully opaque surfaces
+   ============================================================ */
+
+/* ── Base container ── */
+.global-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  /* Dark base that matches the app's background */
+  background: #050a0f;
+}
+
+/* ── Background image ── */
+.global-bg-img {
+  position: absolute;
+  inset: 0;
+  background-image: url('/impactiq-3d-bg.png');
+
+  /*
+   * The new image is a wide landscape tech-dashboard scene.
+   * center 40% positions the bright neon dashboard slightly above
+   * center so it occupies the main content viewing area.
+   * opacity: 0.28 — the image has a lighter teal base so we keep it
+   * more subdued than the old dark cube image.
+   * mix-blend-mode: luminosity desaturates the teal slightly so it
+   * doesn't clash with the dark graphite UI surfaces.
+   */
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  mix-blend-mode: normal;
+  will-change: auto;
+}
+
+/* ── Vignette — stronger edges to blend teal into dark UI ── */
+.global-bg-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    /* Top: solid behind header, fades quickly */
+    linear-gradient(
+      to bottom,
+      rgba(5, 10, 15, 0.95) 0%,
+      rgba(5, 10, 15, 0.50) 8%,
+      rgba(5, 10, 15, 0)    20%
+    ),
+    /* Bottom: ground the composition */
+    linear-gradient(
+      to top,
+      rgba(5, 10, 15, 0.90) 0%,
+      rgba(5, 10, 15, 0.40) 12%,
+      rgba(5, 10, 15, 0)    25%
+    ),
+    /* Left edge */
+    linear-gradient(
+      to right,
+      rgba(5, 10, 15, 0.80) 0%,
+      rgba(5, 10, 15, 0.25) 10%,
+      rgba(5, 10, 15, 0)    25%
+    ),
+    /* Right edge */
+    linear-gradient(
+      to left,
+      rgba(5, 10, 15, 0.80) 0%,
+      rgba(5, 10, 15, 0.25) 10%,
+      rgba(5, 10, 15, 0)    25%
+    );
+}
+
+/* ── Content surface wash ── */
+.page-content {
+  /* Very light so gaps between cards show the image */
+  background: rgba(5, 10, 15, 0.35);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1280px) {
+  .global-bg-img {
+    background-position: center 38%;
+    opacity: 0.50;
+  }
+}
+
+@media (max-width: 1024px) {
+  .global-bg-img {
+    background-position: center 35%;
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 767px) {
+  .global-bg-img {
+    background-size: cover;
+    background-position: center center;
+    opacity: 0.38;
+  }
+
+  .global-bg-vignette {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(5, 10, 15, 0.95) 0%,
+        rgba(5, 10, 15, 0.30) 10%,
+        rgba(5, 10, 15, 0)    22%
+      ),
+      linear-gradient(
+        to top,
+        rgba(5, 10, 15, 0.90) 0%,
+        rgba(5, 10, 15, 0.20) 10%,
+        rgba(5, 10, 15, 0)    22%
+      );
+  }
+
+  .page-content {
+    background: rgba(5, 10, 15, 0.55);
+  }
+}
+
+@media (min-width: 1920px) {
+  .global-bg-img {
+    background-position: center 42%;
+    opacity: 0.58;
+  }
+}

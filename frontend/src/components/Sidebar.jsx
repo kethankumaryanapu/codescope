@@ -83,11 +83,26 @@ const Sidebar = () => {
       <nav className={sidebarClass} aria-label="Main navigation">
         {/* ── Logo area ── */}
         <div className="sidebar-logo">
+          {/* Compact logomark — always visible */}
           <div className="sidebar-logo-mark" aria-hidden="true">
-            IQ
+            <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+              {/* Hexagonal IQ mark */}
+              <rect width="28" height="28" rx="5" fill="#76b900" />
+              <text
+                x="14"
+                y="19"
+                textAnchor="middle"
+                fontFamily="'JetBrains Mono', 'Fira Code', ui-monospace, monospace"
+                fontSize="12"
+                fontWeight="700"
+                fill="#000"
+                letterSpacing="-0.5"
+              >IQ</text>
+            </svg>
           </div>
-          <span className="sidebar-logo-text">
-            Impact<span>IQ</span>
+          {/* Wordmark — visible only when expanded */}
+          <span className="sidebar-logo-text" aria-label="CodeScope">
+            Impact<span className="sidebar-logo-accent">IQ</span>
           </span>
         </div>
 

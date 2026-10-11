@@ -23,7 +23,7 @@ const Topbar = ({ mobileMenuSlot }) => {
   return (
     <header
       style={{
-        height: "48px",
+        height: "var(--topbar-h, 60px)",
         position: "sticky",
         top: 0,
         zIndex: 100,
@@ -38,41 +38,6 @@ const Topbar = ({ mobileMenuSlot }) => {
     >
       {/* ── Mobile menu toggle (rendered by AppLayout, hidden on desktop) ── */}
       {mobileMenuSlot}
-
-      {/* ── Left: ImpactIQ logotype ── */}
-      <Link
-        to="/dashboard"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          textDecoration: "none",
-          flexShrink: 0,
-        }}
-      >
-        {/* Small green square icon */}
-        <div
-          style={{
-            width: "20px",
-            height: "20px",
-            borderRadius: "3px",
-            background: "#76b900",
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "14px",
-            fontWeight: 600,
-            letterSpacing: "0.02em",
-            color: "var(--text)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Impact<span style={{ color: "#76b900" }}>IQ</span>
-        </span>
-      </Link>
 
       {/* ── Center: repository selector ── */}
       <div

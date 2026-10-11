@@ -1,4 +1,7 @@
-/* App shell v2 — top nav layout */
+/* ============================================================
+   App Shell v2 — CodeScope top-nav layout
+   ============================================================ */
+
 .app-shell-v2 {
   position: relative;
   z-index: 1;
@@ -8,9 +11,10 @@
   background: transparent;
 }
 
-/* Header */
+/* ── Header ──────────────────────────────────────────────────── */
 .shell-header {
   height: 60px;
+  min-height: 60px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -18,77 +22,79 @@
   border-bottom: 1px solid #252830;
   display: flex;
   align-items: center;
-  gap: 0;
   padding: 0 24px;
+  gap: 0;
   flex-shrink: 0;
+  overflow: visible;
 }
 
-/* Logo */
+/* ── Logo ────────────────────────────────────────────────────── */
 .shell-logo {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
-  margin-right: 32px;
+  margin-right: 28px;
 }
-.shell-logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 5px;
-  background: #76b900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: -0.5px;
+
+.shell-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
   flex-shrink: 0;
 }
+
 .shell-logo-text {
   font-family: var(--font-mono);
   font-size: 16px;
   font-weight: 700;
   color: #f0f0f0;
   letter-spacing: -0.3px;
+  white-space: nowrap;
 }
+
 .shell-logo-accent {
   color: #76b900;
 }
 
-/* Primary nav */
+/* ── Primary nav (desktop) ───────────────────────────────────── */
 .shell-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
+  min-width: 0;
 }
+
 .shell-nav-cat {
   position: relative;
 }
+
 .shell-nav-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 6px 12px;
   background: transparent;
   border: none;
   color: #606060;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   cursor: pointer;
   border-radius: 6px;
   transition: color 0.15s, background 0.15s;
   white-space: nowrap;
   position: relative;
+  line-height: 1;
 }
+
 .shell-nav-trigger::after {
   content: '';
   position: absolute;
-  bottom: -1px;
+  bottom: -2px;
   left: 12px;
   right: 12px;
   height: 2px;
@@ -97,155 +103,222 @@
   opacity: 0;
   transition: opacity 0.15s;
 }
+
 .shell-nav-trigger:hover {
-  color: #a0a0a0;
+  color: #c0c0c0;
   background: rgba(255,255,255,0.04);
 }
+
 .shell-nav-trigger.active {
   color: #76b900;
 }
+
 .shell-nav-trigger.active::after {
   opacity: 1;
 }
+
 .shell-nav-trigger.open {
   color: #f0f0f0;
   background: rgba(255,255,255,0.06);
 }
 
-/* Nav dropdown */
+/* Chevron animation */
+.shell-nav-chevron {
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.shell-nav-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Nav backdrop (click-outside close) */
 .shell-nav-backdrop {
   position: fixed;
   inset: 0;
   z-index: 149;
 }
+
+/* Dropdown panel */
 .shell-nav-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   left: 0;
-  min-width: 180px;
-  background: #1a1a1d;
+  min-width: 200px;
+  background: #16191f;
   border: 1px solid #252830;
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
   padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   z-index: 150;
 }
+
+/* Dropdown item */
 .shell-nav-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 9px;
   padding: 8px 12px;
   border-radius: 6px;
-  color: #a0a0a0;
+  color: #9ba3b0;
   font-size: 13px;
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
   white-space: nowrap;
 }
+
 .shell-nav-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: #f0f0f0;
 }
+
 .shell-nav-item.active {
-  background: rgba(118,185,0,0.1);
+  background: rgba(118, 185, 0, 0.1);
   color: #76b900;
 }
 
-/* Right side actions */
+/* ── Right-side actions ──────────────────────────────────────── */
+/*
+ * Single flex row: [repo select] [AI Engine] [settings] [avatar]
+ * hamburger is hidden here on desktop via display:none.
+ * No wrapping, no flex-direction change.
+ */
 .shell-actions {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
   margin-left: auto;
 }
+
+/* Repository selector */
 .shell-repo-select {
   padding: 5px 10px;
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 6px;
-  color: #a0a0a0;
+  color: #9ba3b0;
   font-size: 12px;
   font-family: var(--font-mono);
   outline: none;
   cursor: pointer;
-  max-width: 180px;
+  max-width: 160px;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
 }
+
+.shell-repo-select:hover,
+.shell-repo-select:focus {
+  border-color: #3a3a3a;
+}
+
+/* Settings icon button */
 .shell-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  color: #606060;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2e333d;
+  color: #7a8699;
   text-decoration: none;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   cursor: pointer;
   flex-shrink: 0;
 }
+
 .shell-action-btn:hover {
   color: #f0f0f0;
-  border-color: #353535;
-  background: rgba(255,255,255,0.04);
+  border-color: #424a58;
+  background: rgba(255, 255, 255, 0.08);
 }
+
+.shell-action-btn:focus-visible {
+  outline: 2px solid #76b900;
+  outline-offset: 2px;
+}
+
+/* Avatar circle */
 .shell-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   background: #76b900;
-  border: none;
+  border: 2px solid rgba(118, 185, 0, 0.4);
   color: #000;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: filter 0.15s;
-}
-.shell-avatar:hover {
-  filter: brightness(1.1);
-}
-.shell-mobile-menu-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  color: #a0a0a0;
-  cursor: pointer;
-  flex-shrink: 0;
+  transition: filter 0.15s, border-color 0.15s;
+  line-height: 1;
+  user-select: none;
 }
 
-/* User dropdown */
+.shell-avatar:hover {
+  filter: brightness(1.12);
+  border-color: rgba(118, 185, 0, 0.7);
+}
+
+.shell-avatar:focus-visible {
+  outline: 2px solid #76b900;
+  outline-offset: 2px;
+}
+
+/* Hamburger — hidden on desktop, shown only on mobile */
+.shell-mobile-menu-btn {
+  display: none;           /* hidden on desktop */
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2e333d;
+  border-radius: 7px;
+  color: #9ba3b0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.shell-mobile-menu-btn:hover {
+  color: #f0f0f0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── User dropdown ───────────────────────────────────────────── */
 .shell-dropdown-backdrop {
   position: fixed;
   inset: 0;
   z-index: 149;
 }
+
 .shell-user-dropdown {
   position: absolute;
   right: 0;
   top: 40px;
-  width: 210px;
-  background: #1a1a1d;
+  width: 220px;
+  background: #16191f;
   border: 1px solid #252830;
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
   padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   z-index: 150;
 }
+
 .shell-user-info {
   padding: 8px 10px 10px;
   border-bottom: 1px solid #252830;
@@ -254,12 +327,15 @@
   flex-direction: column;
   gap: 3px;
 }
+
 .shell-user-label {
   font-size: 10px;
-  color: #606060;
+  color: #5a6478;
   letter-spacing: 0.06em;
   font-family: var(--font-mono);
+  text-transform: uppercase;
 }
+
 .shell-user-email {
   font-size: 12px;
   color: #f0f0f0;
@@ -268,13 +344,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .shell-dropdown-item {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
   border-radius: 6px;
-  color: #a0a0a0;
+  color: #9ba3b0;
   font-size: 12px;
   text-decoration: none;
   background: transparent;
@@ -284,19 +361,22 @@
   text-align: left;
   transition: background 0.15s, color 0.15s;
 }
+
 .shell-dropdown-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: #f0f0f0;
 }
+
 .shell-dropdown-item.danger {
   color: #cc3333;
 }
+
 .shell-dropdown-item.danger:hover {
-  background: rgba(204,51,51,0.1);
-  color: #ff4444;
+  background: rgba(204, 51, 51, 0.1);
+  color: #ff5555;
 }
 
-/* Mobile nav */
+/* ── Mobile nav drawer ───────────────────────────────────────── */
 .shell-mobile-nav {
   position: fixed;
   top: 60px;
@@ -312,46 +392,54 @@
   max-height: calc(100vh - 60px);
   overflow-y: auto;
 }
+
 .shell-mobile-cat-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #606060;
+  color: #5a6478;
   font-family: var(--font-mono);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
+
 .shell-mobile-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 9px 12px;
   border-radius: 6px;
-  color: #a0a0a0;
+  color: #9ba3b0;
   font-size: 14px;
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
   margin-bottom: 2px;
 }
+
 .shell-mobile-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: #f0f0f0;
 }
+
 .shell-mobile-item.active {
-  background: rgba(118,185,0,0.1);
+  background: rgba(118, 185, 0, 0.1);
   color: #76b900;
 }
 
-/* Page content */
+/* ── Page content ────────────────────────────────────────────── */
 .shell-page-content {
   flex: 1;
   overflow-y: auto;
-  background: rgba(10,10,10,0.42);
+  background: rgba(10, 10, 10, 0.42);
   min-height: 0;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
   .shell-nav-trigger {
     padding: 6px 8px;
     font-size: 10px;
+    letter-spacing: 0.05em;
   }
   .shell-logo {
     margin-right: 16px;
@@ -359,16 +447,22 @@
 }
 
 @media (max-width: 768px) {
+  .shell-header {
+    padding: 0 16px;
+  }
+
+  /* Hide desktop nav */
   .shell-nav {
     display: none;
   }
+
+  /* Show hamburger — correctly inline with the other actions */
   .shell-mobile-menu-btn {
     display: flex;
   }
+
+  /* Hide repo selector to save space */
   .shell-repo-select {
     display: none;
-  }
-  .shell-header {
-    padding: 0 16px;
   }
 }

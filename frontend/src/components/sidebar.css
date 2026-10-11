@@ -25,13 +25,14 @@
 
 /* ── Logo / wordmark area ── */
 .sidebar-logo {
-  height: var(--topbar-h);
+  height: 60px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  gap: 10px;
+  gap: 11px;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -41,43 +42,52 @@
   justify-content: center;
 }
 
+/* The SVG-based logo mark */
 .sidebar-logo-mark {
-  width: 28px;
-  height: 28px;
-  background: var(--nvidia);
-  border-radius: 4px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  border-radius: 6px;
+  /* subtle outer ring so the mark reads against the dark sidebar */
+  box-shadow: 0 0 0 1px rgba(118, 185, 0, 0.35);
 }
 
+.sidebar-logo-mark svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+}
+
+/* Wordmark text — expanded only */
 .sidebar-logo-text {
   font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  /* use max-width so the transition actually collapses the element */
+  max-width: 160px;
   opacity: 1;
-  transition: opacity 150ms ease;
+  transition: opacity 180ms ease, max-width 180ms ease;
   white-space: nowrap;
+  overflow: hidden;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
 }
 
-.sidebar-logo-text span {
+.sidebar-logo-accent {
   color: var(--nvidia);
 }
 
 .sidebar.collapsed .sidebar-logo-text {
   opacity: 0;
+  max-width: 0;
   pointer-events: none;
-  width: 0;
-  overflow: hidden;
 }
 
 /* ── Scrollable nav area ── */
@@ -394,7 +404,7 @@
 
   .sidebar.collapsed .sidebar-logo-text {
     opacity: 1;
-    width: auto;
+    max-width: 160px;
     overflow: visible;
     pointer-events: auto;
   }
