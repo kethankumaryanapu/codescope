@@ -54,6 +54,11 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Define ambientDrift locally so auth.css is self-contained */
+  @keyframes ambientDrift {
+    0%,100% { transform: translate(0, 0); }
+    50%      { transform: translate(-6px, -8px); }
+  }
   .auth-left::before { animation: ambientDrift 28s ease-in-out infinite; }
   .auth-left::after  { animation: ambientDrift 35s ease-in-out infinite reverse; }
 }

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FolderTree, FileText,
@@ -35,9 +36,26 @@ const IntelligenceHub = () => {
   const location = useLocation();
   const { selectedRepo, repoFiles } = useAnalysis();
 
-  /* Pointer-tilt handlers for feature cards */
-  const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouch = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
+  /* Pointer-tilt handlers for feature cards — reactive media query subscriptions */
+  const [prefersReduced, setPrefersReduced] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  const [isTouch, setIsTouch] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
+  );
+
+  useEffect(() => {
+    const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mqTouch   = window.matchMedia('(hover: none)');
+    const onReduced = (e) => setPrefersReduced(e.matches);
+    const onTouch   = (e) => setIsTouch(e.matches);
+    mqReduced.addEventListener('change', onReduced);
+    mqTouch.addEventListener('change', onTouch);
+    return () => {
+      mqReduced.removeEventListener('change', onReduced);
+      mqTouch.removeEventListener('change', onTouch);
+    };
+  }, []);
 
   const handleTiltMove = (e) => {
     if (prefersReduced || isTouch) return;
