@@ -9,6 +9,76 @@ import NvidiaStatus from './NvidiaStatus';
 import './GlobalBackground.css';
 import './AppShell.css';
 
+/* ── BgSvgLayer — decorative SVG connection lines + particles ── */
+const BgSvgLayer = () => {
+  const nodes = [
+    [8, 18], [25, 42], [45, 15], [62, 55], [78, 22],
+    [90, 65], [15, 75], [50, 85], [72, 38], [35, 68]
+  ];
+  const edges = [
+    [0,1],[1,2],[2,4],[4,5],[0,6],[3,4],[3,7],[7,8],[5,8],[2,3],[6,7],[1,3]
+  ];
+  // 35 hardcoded particles at fixed positions, alternating lime/cyan
+  const particles = [
+    {x:5,y:12,r:1,c:'#76b900',op:0.18,dur:18},{x:18,y:8,r:1.5,c:'#00c8a0',op:0.15,dur:22},
+    {x:30,y:22,r:1,c:'#76b900',op:0.22,dur:27},{x:42,y:5,r:1,c:'#00c8a0',op:0.16,dur:19},
+    {x:55,y:30,r:1.5,c:'#76b900',op:0.2,dur:31},{x:68,y:10,r:1,c:'#00c8a0',op:0.17,dur:25},
+    {x:80,y:28,r:1,c:'#76b900',op:0.19,dur:33},{x:92,y:15,r:1.5,c:'#00c8a0',op:0.15,dur:20},
+    {x:97,y:45,r:1,c:'#76b900',op:0.21,dur:28},{x:85,y:50,r:1,c:'#00c8a0',op:0.18,dur:23},
+    {x:10,y:35,r:1.5,c:'#76b900',op:0.16,dur:35},{x:22,y:58,r:1,c:'#00c8a0',op:0.2,dur:17},
+    {x:38,y:48,r:1,c:'#76b900',op:0.22,dur:29},{x:50,y:62,r:1.5,c:'#00c8a0',op:0.15,dur:21},
+    {x:65,y:40,r:1,c:'#76b900',op:0.19,dur:26},{x:75,y:60,r:1,c:'#00c8a0',op:0.17,dur:32},
+    {x:88,y:78,r:1.5,c:'#76b900',op:0.18,dur:24},{x:3,y:55,r:1,c:'#00c8a0',op:0.16,dur:30},
+    {x:14,y:70,r:1,c:'#76b900',op:0.21,dur:18},{x:28,y:80,r:1.5,c:'#00c8a0',op:0.15,dur:34},
+    {x:42,y:72,r:1,c:'#76b900',op:0.2,dur:22},{x:58,y:78,r:1,c:'#00c8a0',op:0.18,dur:27},
+    {x:70,y:88,r:1.5,c:'#76b900',op:0.16,dur:20},{x:82,y:92,r:1,c:'#00c8a0',op:0.19,dur:31},
+    {x:94,y:82,r:1,c:'#76b900',op:0.22,dur:25},{x:7,y:90,r:1.5,c:'#00c8a0',op:0.15,dur:19},
+    {x:20,y:95,r:1,c:'#76b900',op:0.17,dur:28},{x:35,y:88,r:1,c:'#00c8a0',op:0.21,dur:23},
+    {x:48,y:95,r:1.5,c:'#76b900',op:0.16,dur:33},{x:62,y:92,r:1,c:'#00c8a0',op:0.19,dur:17},
+    {x:76,y:98,r:1,c:'#76b900',op:0.18,dur:26},{x:90,y:94,r:1.5,c:'#00c8a0',op:0.15,dur:35},
+    {x:52,y:20,r:1,c:'#76b900',op:0.2,dur:21},{x:33,y:35,r:1,c:'#00c8a0',op:0.17,dur:29},
+    {x:60,y:70,r:1.5,c:'#76b900',op:0.22,dur:24}
+  ];
+  return (
+    <svg
+      className="global-bg-svg"
+      aria-hidden="true"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {edges.map(([a,b],i) => {
+        const dashLen = 12 + (i % 5) * 4;
+        const dur = 6 + (i % 7) * 2;
+        const isLime = i % 2 === 0;
+        return (
+          <line
+            key={i}
+            x1={nodes[a][0]} y1={nodes[a][1]}
+            x2={nodes[b][0]} y2={nodes[b][1]}
+            stroke={isLime ? 'rgba(118,185,0,0.15)' : 'rgba(0,200,160,0.12)'}
+            strokeWidth="0.5"
+            strokeDasharray={dashLen}
+            style={{
+              animation: `dashFlow ${dur}s linear infinite`,
+              strokeDashoffset: 0
+            }}
+          />
+        );
+      })}
+      {particles.map((p,i) => (
+        <circle
+          key={i}
+          cx={p.x} cy={p.y} r={p.r}
+          fill={p.c}
+          opacity={p.op}
+          style={{ animation: `particleDrift ${p.dur}s ease-in-out infinite` }}
+        />
+      ))}
+    </svg>
+  );
+};
+
 /* ── Navigation structure (matches existing routes) ── */
 const NAV_CATEGORIES = [
   {
@@ -133,6 +203,7 @@ const AppShell = ({ children }) => {
         <span className="bg-fragment" style={{'--dur':'28s','--delay':'-5s',top:'72%',right:'22%'}}>embeddings.search()</span>
         <span className="bg-fragment" style={{'--dur':'34s','--delay':'-20s',top:'45%',left:'55%'}}>reviewCode(diff)</span>
         <span className="bg-fragment" style={{'--dur':'19s','--delay':'-11s',top:'25%',right:'38%'}}>merge --ff-only</span>
+        <BgSvgLayer />
         <div className="global-bg-vignette" />
         <div className="global-bg-leftfade" />
       </div>

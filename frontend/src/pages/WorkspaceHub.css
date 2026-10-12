@@ -36,14 +36,17 @@
 
 /* ── Hero panel ───────────────────────────────────────────────── */
 .wh-hero {
-  background: var(--wh-surface);
-  border: 1px solid var(--wh-border);
+  background: linear-gradient(135deg, rgba(22,28,40,0.96) 0%, rgba(14,20,30,0.98) 100%);
+  border: 1px solid rgba(118,185,0,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 8px 40px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(118,185,0,0.04);
   border-radius: 14px;
   padding: 28px 28px 24px;
   margin-bottom: 22px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.45);
 }
 
 /* Subtle NVIDIA green top-left accent line */
@@ -54,13 +57,8 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    to right,
-    #76b900 0%,
-    rgba(118, 185, 0, 0.3) 40%,
-    transparent 70%
-  );
-  box-shadow: 0 0 40px rgba(118, 185, 0, 0.15);
+  background: linear-gradient(to right, var(--lime) 0%, var(--cyan) 60%, transparent 100%);
+  box-shadow: 0 0 20px rgba(118,185,0,0.2);
 }
 
 .wh-hero-inner {
@@ -96,8 +94,8 @@
   align-items: center;
   gap: 7px;
   padding: 5px 12px;
-  background: rgba(118, 185, 0, 0.08);
-  border: 1px solid rgba(118, 185, 0, 0.2);
+  background: linear-gradient(135deg, rgba(118,185,0,0.08) 0%, rgba(0,200,160,0.05) 100%);
+  border: 1px solid rgba(118,185,0,0.2);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
@@ -172,25 +170,29 @@
 
 /* ── Metric card ──────────────────────────────────────────────── */
 .wh-metric-card {
-  background: var(--wh-surface);
-  border: 1px solid var(--wh-border);
+  background: linear-gradient(145deg, rgba(24,30,44,0.97) 0%, rgba(16,22,34,0.99) 100%);
+  border: 1px solid rgba(118,185,0,0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 4px 20px rgba(0,0,0,0.5);
   border-radius: 12px;
   padding: 20px 20px 18px;
   cursor: pointer;
-  transition: background 180ms ease, border-color 180ms ease,
-              transform 180ms ease, box-shadow 180ms ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   user-select: none;
   outline: none;
   position: relative;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.45);
 }
 
 .wh-metric-card:hover,
 .wh-metric-card:focus-visible {
-  background: var(--wh-surface-2);
-  border-color: rgba(118, 185, 0, 0.35);
-  transform: translateY(-2px);
-  box-shadow: var(--glow-lime), 0 8px 32px rgba(0, 0, 0, 0.5);
+  border-color: rgba(118,185,0,0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 12px 40px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(118,185,0,0.12),
+    0 0 24px rgba(118,185,0,0.06);
+  transform: translateY(-3px);
 }
 
 .wh-metric-card:focus-visible {
@@ -247,11 +249,17 @@
 
 /* ── Content card (generic) ───────────────────────────────────── */
 .wh-card {
-  background: var(--wh-surface);
-  border: 1px solid var(--wh-border);
+  background: linear-gradient(145deg, rgba(22,28,40,0.96) 0%, rgba(14,20,30,0.98) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.5);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wh-card:hover {
+  border-color: rgba(118,185,0,0.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.6);
 }
 
 .wh-card-title {

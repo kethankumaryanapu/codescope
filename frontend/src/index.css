@@ -410,6 +410,17 @@ button {
     0%   { transform: translateY(-100%); }
     100% { transform: translateY(100vh); }
   }
+  @keyframes dashFlow {
+    to { stroke-dashoffset: -100; }
+  }
+  @keyframes particleDrift {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 
   /* Staggered fade-up utility */
   .fade-up-stagger > * {
