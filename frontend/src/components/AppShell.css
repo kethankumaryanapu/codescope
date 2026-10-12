@@ -18,8 +18,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #0f1117;
-  border-bottom: 1px solid #252830;
+  background: rgba(5, 10, 15, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(118, 185, 0, 0.12);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -111,10 +113,12 @@
 
 .shell-nav-trigger.active {
   color: #76b900;
+  text-shadow: 0 0 12px rgba(118, 185, 0, 0.5);
 }
 
 .shell-nav-trigger.active::after {
   opacity: 1;
+  box-shadow: 0 0 8px rgba(118, 185, 0, 0.6);
 }
 
 .shell-nav-trigger.open {
@@ -146,10 +150,12 @@
   top: calc(100% + 6px);
   left: 0;
   min-width: 200px;
-  background: #16191f;
-  border: 1px solid #252830;
+  background: rgba(13, 17, 23, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(118, 185, 0, 0.15);
   border-radius: 8px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(118, 185, 0, 0.08);
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -199,22 +205,23 @@
 /* Repository selector */
 .shell-repo-select {
   padding: 5px 10px;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background: rgba(22, 27, 34, 0.9);
+  border: 1px solid rgba(118, 185, 0, 0.2);
   border-radius: 6px;
-  color: #9ba3b0;
+  color: #c0c8d0;
   font-size: 12px;
   font-family: var(--font-mono);
   outline: none;
   cursor: pointer;
   max-width: 160px;
   flex-shrink: 0;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .shell-repo-select:hover,
 .shell-repo-select:focus {
-  border-color: #3a3a3a;
+  border-color: rgba(118, 185, 0, 0.5);
+  box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.08);
 }
 
 /* Settings icon button */
@@ -245,6 +252,15 @@
   outline-offset: 2px;
 }
 
+/* Focus rings on interactive shell elements */
+.shell-repo-select:focus-visible,
+.shell-avatar:focus-visible,
+.shell-nav-item:focus-visible {
+  outline: 2px solid #76b900;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(118, 185, 0, 0.15);
+}
+
 /* Avatar circle */
 .shell-avatar {
   width: 32px;
@@ -268,6 +284,7 @@
 .shell-avatar:hover {
   filter: brightness(1.12);
   border-color: rgba(118, 185, 0, 0.7);
+  box-shadow: var(--glow-lime);
 }
 
 .shell-avatar:focus-visible {
@@ -308,10 +325,12 @@
   right: 0;
   top: 40px;
   width: 220px;
-  background: #16191f;
-  border: 1px solid #252830;
+  background: rgba(13, 17, 23, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(118, 185, 0, 0.15);
   border-radius: 8px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(118, 185, 0, 0.08);
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -430,7 +449,7 @@
 .shell-page-content {
   flex: 1;
   overflow-y: auto;
-  background: rgba(10, 10, 10, 0.42);
+  background: rgba(5, 10, 15, 0.5);
   min-height: 0;
 }
 

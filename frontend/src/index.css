@@ -6,16 +6,25 @@
 :root {
   color-scheme: dark;
 
-  /* Backgrounds */
-  --bg: #0a0a0a;
+  /* Cinematic design tokens */
+  --lime: #76b900;
+  --lime-dim: rgba(118,185,0,0.12);
+  --lime-glow: rgba(118,185,0,0.35);
+  --cyan: #00c8a0;
+  --cyan-dim: rgba(0,200,160,0.1);
+  --cyan-glow: rgba(0,200,160,0.3);
+  --bg: #050a0f;
+  --surface-1: #0d1117;
+  --surface-2: #161b22;
+  --surface-3: #1e2430;
+  --border: #21262d;
+  --border-2: #30363d;
+  --glow-lime: 0 0 24px rgba(118,185,0,0.25);
+  --glow-cyan: 0 0 24px rgba(0,200,160,0.2);
+
+  /* Backgrounds (legacy + updated) */
   --bg-2: #0f0f0f;
   --surface: #141414;
-  --surface-2: #1a1a1a;
-  --surface-3: #202020;
-
-  /* Borders */
-  --border: #2a2a2a;
-  --border-2: #333333;
 
   /* Typography */
   --text: #f0f0f0;
@@ -379,4 +388,38 @@ button {
   .hero-panel {
     padding: 16px;
   }
+}
+
+/* ============================================================
+   CINEMATIC KEYFRAMES — guarded by prefers-reduced-motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ambientDrift {
+    0%, 100% { transform: translate(0, 0); }
+    50%       { transform: translate(-6px, -8px); }
+  }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scanline {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  /* Staggered fade-up utility */
+  .fade-up-stagger > * {
+    opacity: 0;
+    animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .fade-up-stagger > *:nth-child(1) { animation-delay:   0ms; }
+  .fade-up-stagger > *:nth-child(2) { animation-delay:  40ms; }
+  .fade-up-stagger > *:nth-child(3) { animation-delay:  80ms; }
+  .fade-up-stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .fade-up-stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .fade-up-stagger > *:nth-child(6) { animation-delay: 200ms; }
 }

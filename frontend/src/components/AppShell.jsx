@@ -122,10 +122,19 @@ const AppShell = ({ children }) => {
 
   return (
     <div className="app-shell-v2">
-      {/* Global 3D background */}
+      {/* Global 3D background — 5-layer depth system */}
       <div className="global-bg" aria-hidden="true">
-        <div className="global-bg-img" />
+        <div className="global-bg-art" />
+        <div className="global-bg-grid" />
+        <div className="global-bg-lights" />
+        <span className="bg-fragment" style={{'--dur':'26s','--delay':'0s',top:'18%',left:'8%'}}>runImpactAnalysis()</span>
+        <span className="bg-fragment" style={{'--dur':'31s','--delay':'-8s',top:'35%',right:'12%'}}>git diff HEAD~1</span>
+        <span className="bg-fragment" style={{'--dur':'22s','--delay':'-14s',top:'62%',left:'18%'}}>AST.traverse(node)</span>
+        <span className="bg-fragment" style={{'--dur':'28s','--delay':'-5s',top:'72%',right:'22%'}}>embeddings.search()</span>
+        <span className="bg-fragment" style={{'--dur':'34s','--delay':'-20s',top:'45%',left:'55%'}}>reviewCode(diff)</span>
+        <span className="bg-fragment" style={{'--dur':'19s','--delay':'-11s',top:'25%',right:'38%'}}>merge --ff-only</span>
         <div className="global-bg-vignette" />
+        <div className="global-bg-leftfade" />
       </div>
 
       {/* ── Header ── */}

@@ -35,6 +35,24 @@ const IntelligenceHub = () => {
   const location = useLocation();
   const { selectedRepo, repoFiles } = useAnalysis();
 
+  /* Pointer-tilt handlers for feature cards */
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
+
+  const handleTiltMove = (e) => {
+    if (prefersReduced || isTouch) return;
+    const card = e.currentTarget;
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    card.style.setProperty('--tx', `${(x * 6).toFixed(2)}deg`);
+    card.style.setProperty('--ty', `${(-y * 6).toFixed(2)}deg`);
+  };
+  const handleTiltLeave = (e) => {
+    e.currentTarget.style.setProperty('--tx', '0deg');
+    e.currentTarget.style.setProperty('--ty', '0deg');
+  };
+
   return (
     <div className="ih-root">
       {/* Hero */}
@@ -86,6 +104,8 @@ const IntelligenceHub = () => {
                 key={card.to}
                 className="ih-card"
                 onClick={() => navigate(card.to)}
+                onMouseMove={handleTiltMove}
+                onMouseLeave={handleTiltLeave}
                 aria-label={`Navigate to ${card.title}`}
               >
                 <div className="ih-card-header">

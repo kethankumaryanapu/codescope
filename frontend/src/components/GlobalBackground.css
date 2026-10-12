@@ -1,13 +1,15 @@
 /* ============================================================
-   GLOBAL BACKGROUND — ImpactIQ tech dashboard watermark
+   GLOBAL BACKGROUND — CodeScope 5-layer depth system
 
    Z-INDEX ARCHITECTURE
    ────────────────────
-   -2   .global-bg          base layer (position: fixed, full viewport)
-   -1   .global-bg-img      background image at watermark opacity
-    0   .global-bg-vignette edge-fade overlay blends image into dark app
-    1   .app-shell          document flow
-   10   .sidebar / header   fully opaque surfaces
+   -2   .global-bg            base container (position: fixed)
+    1   .global-bg-art        background image (blend + drift)
+    2   .global-bg-grid       perspective grid floor
+    3   .global-bg-lights     radial ambient colour lights
+    4   .bg-fragment          floating code badges
+    5   .global-bg-vignette   edge vignette
+    6   .global-bg-leftfade   left-side headline readability fade
    ============================================================ */
 
 /* ── Base container ── */
@@ -15,125 +17,147 @@
   position: fixed;
   inset: 0;
   z-index: -2;
-  pointer-events: none;
   overflow: hidden;
-  /* Dark base that matches the app's background */
+  pointer-events: none;
   background: #050a0f;
 }
 
-/* ── Background image ── */
-.global-bg-img {
+/* ── Layer 1 — Background art ── */
+.global-bg-art {
   position: absolute;
   inset: 0;
-  background-image: url('/impactiq-3d-bg.png');
-
-  /*
-   * The new image is a wide landscape tech-dashboard scene.
-   * center 40% positions the bright neon dashboard slightly above
-   * center so it occupies the main content viewing area.
-   * opacity: 0.28 — the image has a lighter teal base so we keep it
-   * more subdued than the old dark cube image.
-   * mix-blend-mode: luminosity desaturates the teal slightly so it
-   * doesn't clash with the dark graphite UI surfaces.
-   */
+  background-image: url('/codescope-3d-bg.png');
   background-size: cover;
-  background-position: center 40%;
-  background-repeat: no-repeat;
-  opacity: 0.55;
-  mix-blend-mode: normal;
-  will-change: auto;
+  background-position: center 38%;
+  opacity: 0.45;
+  mix-blend-mode: luminosity;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .global-bg-art {
+    animation: ambientDrift 38s ease-in-out infinite;
+  }
 }
 
-/* ── Vignette — stronger edges to blend teal into dark UI ── */
+/* ── Layer 2 — Perspective grid floor ── */
+.global-bg-grid {
+  position: absolute;
+  top: 50%;
+  bottom: 0;
+  left: -20%;
+  right: -20%;
+  background-image:
+    linear-gradient(rgba(118, 185, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(118, 185, 0, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(800px) rotateX(55deg) scaleY(1.4);
+  transform-origin: center bottom;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Layer 3 — Radial ambient lights ── */
+.global-bg-lights {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 35% at 15% 25%, rgba(118, 185, 0, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 75%, rgba(0, 200, 160, 0.09) 0%, transparent 70%);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── Layer 4 — Floating code fragment badges ── */
+.bg-fragment {
+  position: absolute;
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(118, 185, 0, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 4;
+  user-select: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bg-fragment {
+    animation: floatY var(--dur, 24s) ease-in-out infinite var(--delay, 0s);
+  }
+}
+
+/* ── Layer 5 — Vignette ── */
 .global-bg-vignette {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-
   background:
-    /* Top: solid behind header, fades quickly */
-    linear-gradient(
-      to bottom,
-      rgba(5, 10, 15, 0.95) 0%,
-      rgba(5, 10, 15, 0.50) 8%,
-      rgba(5, 10, 15, 0)    20%
-    ),
-    /* Bottom: ground the composition */
-    linear-gradient(
-      to top,
-      rgba(5, 10, 15, 0.90) 0%,
-      rgba(5, 10, 15, 0.40) 12%,
-      rgba(5, 10, 15, 0)    25%
-    ),
-    /* Left edge */
-    linear-gradient(
-      to right,
-      rgba(5, 10, 15, 0.80) 0%,
-      rgba(5, 10, 15, 0.25) 10%,
-      rgba(5, 10, 15, 0)    25%
-    ),
-    /* Right edge */
-    linear-gradient(
-      to left,
-      rgba(5, 10, 15, 0.80) 0%,
-      rgba(5, 10, 15, 0.25) 10%,
-      rgba(5, 10, 15, 0)    25%
-    );
+    radial-gradient(ellipse 80% 60% at 50% 0%, transparent 40%, rgba(5, 10, 15, 0.6) 100%),
+    radial-gradient(ellipse 100% 50% at 50% 100%, rgba(5, 10, 15, 0.8) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 5;
 }
 
-/* ── Content surface wash ── */
-.page-content {
-  /* Very light so gaps between cards show the image */
-  background: rgba(5, 10, 15, 0.35);
+/* ── Layer 6 — Left-side dark gradient for headline readability ── */
+.global-bg-leftfade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(5, 10, 15, 0.92) 0%,
+    rgba(5, 10, 15, 0.60) 20%,
+    rgba(5, 10, 15, 0)    45%
+  );
+  pointer-events: none;
+  z-index: 6;
 }
 
 /* ── Responsive ── */
-
 @media (max-width: 1280px) {
-  .global-bg-img {
-    background-position: center 38%;
-    opacity: 0.50;
+  .global-bg-art {
+    background-position: center 36%;
+    opacity: 0.40;
   }
 }
 
 @media (max-width: 1024px) {
-  .global-bg-img {
+  .global-bg-art {
     background-position: center 35%;
-    opacity: 0.45;
+    opacity: 0.38;
   }
 }
 
 @media (max-width: 767px) {
-  .global-bg-img {
+  .global-bg-art {
     background-size: cover;
     background-position: center center;
-    opacity: 0.38;
+    opacity: 0.30;
   }
 
   .global-bg-vignette {
     background:
-      linear-gradient(
-        to bottom,
-        rgba(5, 10, 15, 0.95) 0%,
-        rgba(5, 10, 15, 0.30) 10%,
-        rgba(5, 10, 15, 0)    22%
-      ),
-      linear-gradient(
-        to top,
-        rgba(5, 10, 15, 0.90) 0%,
-        rgba(5, 10, 15, 0.20) 10%,
-        rgba(5, 10, 15, 0)    22%
-      );
+      radial-gradient(ellipse 80% 50% at 50% 0%, transparent 30%, rgba(5, 10, 15, 0.8) 100%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(5, 10, 15, 0.9) 0%, transparent 60%);
   }
 
-  .page-content {
-    background: rgba(5, 10, 15, 0.55);
+  .global-bg-leftfade {
+    background: linear-gradient(
+      to right,
+      rgba(5, 10, 15, 0.95) 0%,
+      rgba(5, 10, 15, 0.70) 30%,
+      rgba(5, 10, 15, 0)    60%
+    );
   }
 }
 
 @media (min-width: 1920px) {
-  .global-bg-img {
+  .global-bg-art {
     background-position: center 42%;
-    opacity: 0.58;
+    opacity: 0.50;
   }
+}
+
+/* ── Content surface wash (referenced by some inner pages) ── */
+.page-content {
+  background: rgba(5, 10, 15, 0.35);
 }
