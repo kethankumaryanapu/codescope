@@ -13,6 +13,7 @@ import {
   getRepositoryWebhookStatus,
 } from '../services/githubService.js';
 import { getRepositories, registerConnectedRepository } from '../services/codeIndexer.js';
+import { sanitizeErrorForClient } from '../services/orchestratorService.js';
 
 const resolveWebhookBaseUrl = (req, explicitUrl) => {
   if (explicitUrl && explicitUrl.startsWith('http')) {
@@ -34,11 +35,11 @@ export const handleListGitHubRepos = async (req, res) => {
   try {
     const result = await listUserRepositories();
     if (!result.ok) {
-      return res.status(result.status || 400).json({ error: result.error });
+      return res.status(result.status || 400).json({ error: sanitizeErrorForClient(result.error) });
     }
     return res.status(200).json({ repos: result.repos });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: sanitizeErrorForClient(err) || 'Failed to list GitHub repositories.' });
   }
 };
 
@@ -104,7 +105,7 @@ export const handleAutoSetupWebhook = async (req, res) => {
     });
   } catch (err) {
     console.error('[Controller/GitHub] Webhook auto-setup error:', err.message);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: sanitizeErrorForClient(err) || 'Failed to auto-setup webhook.' });
   }
 };
 

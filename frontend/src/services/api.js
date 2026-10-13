@@ -118,12 +118,12 @@ export const fetchHistory = async () => {
 import { synthesizeClientImpact, synthesizeClientPreReview } from './aiService';
 
 // AI Core APIs
-export const analyzeImpact = async (brdText, repoId = 'repo-1', requirementId = 'JIRA-241', customFiles = []) => {
+export const analyzeImpact = async (brdText, repoId = 'repo-1', requirementId = 'JIRA-241', customFiles = [], rawGitDiff = null) => {
   try {
     const response = await fetch('/api/impact-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-      body: JSON.stringify({ brdText, repoId, requirementId }),
+      body: JSON.stringify({ brdText, repoId, requirementId, rawGitDiff }),
     });
 
     if (response.ok) {
@@ -136,6 +136,36 @@ export const analyzeImpact = async (brdText, repoId = 'repo-1', requirementId = 
 
   // Graceful client-side AI fallback engine
   return synthesizeClientImpact(brdText, customFiles, requirementId);
+};
+
+export const orchestratePipeline = async ({ brdText, repoId = 'repo-1', requirementId = 'JIRA-241', rawGitDiff = null }) => {
+  try {
+    const response = await fetch('/api/orchestrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({ brdText, repoId, requirementId, rawGitDiff }),
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.error || 'Orchestration failed');
+  } catch (err) {
+    console.warn('Orchestration API request failed:', err.message);
+    throw err;
+  }
+};
+
+export const fetchExecutionStatus = async (executionId) => {
+  const response = await fetch(`/api/orchestrate/status/${encodeURIComponent(executionId)}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch execution status');
+  }
+  return response.json();
 };
 
 export const preReviewCode = async (rawGitDiff, requirementId = 'JIRA-241', repoId = 'repo-1') => {

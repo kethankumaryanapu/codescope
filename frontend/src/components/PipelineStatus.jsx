@@ -20,21 +20,23 @@ const PipelineStatus = ({ workflow }) => {
         const isCompleted = s === 'completed';
         const isRunning = s === 'running';
         const isFailed = s === 'failed';
-        const color = isCompleted ? '#76b900' : isRunning ? '#4a9eff' : isFailed ? '#cc3333' : '#2a2a2a';
-        const textColor = isCompleted ? '#76b900' : isRunning ? '#4a9eff' : isFailed ? '#cc3333' : '#606060';
+        const isSkipped = s === 'skipped';
+        const color = isCompleted ? '#76b900' : isRunning ? '#4a9eff' : isFailed ? '#cc3333' : isSkipped ? '#64748b' : '#2a2a2a';
+        const textColor = isCompleted ? '#76b900' : isRunning ? '#4a9eff' : isFailed ? '#cc3333' : isSkipped ? '#64748b' : '#606060';
 
         return (
           <div key={step.key} style={{display:'flex', alignItems:'center', flex:1}}>
             <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px'}}>
               <div style={{
                 width:'28px', height:'28px', borderRadius:'50%',
-                background: isCompleted ? 'rgba(118,185,0,0.15)' : 'var(--surface-2)',
+                background: isCompleted ? 'rgba(118,185,0,0.15)' : isSkipped ? 'rgba(100,116,139,0.12)' : 'var(--surface-2)',
                 border:`1.5px solid ${color}`,
                 display:'flex', alignItems:'center', justifyContent:'center',
                 flexShrink:0,
               }}>
                 {isCompleted ? <Check size={13} color="#76b900"/> :
                  isFailed ? <AlertCircle size={13} color="#cc3333"/> :
+                 isSkipped ? <span style={{fontSize:'12px', color:'#64748b', fontWeight:700}}>—</span> :
                  isRunning ? <span style={{width:'8px', height:'8px', borderRadius:'50%',
                    background:'#4a9eff', boxShadow:'0 0 8px #4a9eff',}}/> :
                  <Circle size={10} color={color}/>}

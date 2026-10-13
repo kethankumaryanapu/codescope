@@ -1,6 +1,7 @@
 import parseDiff from 'parse-diff';
-import { generateImpactPrimer, generatePreReview } from '../services/geminiServices.js';
-import { getIndexedFilesForRepo, getAllIndexedFilesWithDetails, getRepositoryByNameOrId } from '../services/codeIndexer.js';
+import { generatePreReview } from '../services/geminiServices.js';
+import { getRepositoryByNameOrId } from '../services/codeIndexer.js';
+import { runOrchestrationPipeline, getExecutionStatus } from '../services/orchestratorService.js';
 import { addHistoryEntry } from './repoController.js';
 import {
   sendEmailNotification,
@@ -45,32 +46,42 @@ const resolveTargetOwnerEmail = async (repoId, req) => {
   return null;
 };
 
+/**
+ * Handle Impact Analysis via Multi-Agent Orchestration Pipeline
+ * Preserves 100% backward compatibility for Task 4 response contracts while executing real stages.
+ */
 export const handleImpactAnalysis = async (req, res) => {
   try {
-    const { brdText, repoId, requirementId } = req.body;
+    const { brdText, repoId, requirementId, rawGitDiff, provider, model } = req.body;
 
     if (!brdText) {
       return res.status(400).json({ error: 'BRD / Requirement text is required.' });
     }
 
-    // Get live indexed files (with rootPath, functions, module tags)
-    const detailedFiles = getAllIndexedFilesWithDetails(repoId || 'repo-1');
-    const candidateFiles = detailedFiles.map((f) => ({
-      filePath: f.filePath || f.rootPath,
-      module: f.module,
-      functions: f.functions,
-      lineCount: f.lineCount,
-      isTestFile: f.isTestFile,
-    }));
+    const result = await runOrchestrationPipeline({
+      brdText,
+      repoId: repoId || 'repo-1',
+      requirementId: requirementId || 'JIRA-REQ',
+      rawGitDiff: rawGitDiff || null,
+      provider: provider || null,
+      model: model || null,
+    });
 
-    const result = await generateImpactPrimer(brdText, candidateFiles);
+    if (result.status === 'Failed' && result.stages?.coordinator?.status === 'failed') {
+      return res.status(400).json({
+        error: result.error || 'Coordinator validation failed.',
+        executionId: result.executionId,
+        stages: result.stages,
+        workflow: result.workflow,
+      });
+    }
 
     // Record into history
     addHistoryEntry({
       id: `HIST-${Date.now()}`,
-      requirementId: requirementId || 'JIRA-REQ',
+      requirementId: result.requirementId || requirementId || 'JIRA-REQ',
       title: brdText.split('\n')[0].replace(/^Requirement:\s*/, '') || 'Code Impact Analysis',
-      status: 'Completed',
+      status: result.status === 'Failed' ? 'Failed' : 'Completed',
       confidence: result.stats?.confidence || '97%',
       impactedFiles: result.impactedFiles?.length || 4,
       timestamp: 'Just now',
@@ -82,7 +93,7 @@ export const handleImpactAnalysis = async (req, res) => {
       console.log(`[Impact Analysis] 📧 Dispatching notification to Repo Owner: ${targetOwner.email} (${targetOwner.name})`);
       const emailTmpl = emailImpactComplete(
         targetOwner.name,
-        requirementId || 'JIRA-REQ',
+        result.requirementId || requirementId || 'JIRA-REQ',
         result.impactedFiles?.length || 4,
         result.summaryMarkdown || result.primer || ''
       );
@@ -96,6 +107,67 @@ export const handleImpactAnalysis = async (req, res) => {
     console.error('Impact Controller Error:', error);
     return res.status(500).json({ error: 'Failed to process impact analysis.' });
   }
+};
+
+/**
+ * Direct Multi-Agent Orchestration Endpoint
+ * Runs Coordinator -> Requirement -> Impact -> Review -> PR Generator pipeline
+ */
+export const handleOrchestrate = async (req, res) => {
+  try {
+    const { brdText, repoId, requirementId, rawGitDiff, executionId, provider, model } = req.body;
+
+    if (!brdText) {
+      return res.status(400).json({ error: 'BRD / Requirement text is required.' });
+    }
+
+    const result = await runOrchestrationPipeline({
+      brdText,
+      repoId: repoId || 'repo-1',
+      requirementId: requirementId || 'JIRA-REQ',
+      rawGitDiff: rawGitDiff || null,
+      executionId: executionId || null,
+      provider: provider || null,
+      model: model || null,
+    });
+
+    if (result.status === 'Failed' && result.stages?.coordinator?.status === 'failed') {
+      return res.status(400).json({
+        error: result.error || 'Coordinator validation failed.',
+        executionId: result.executionId,
+        stages: result.stages,
+        workflow: result.workflow,
+      });
+    }
+
+    // Record into history
+    addHistoryEntry({
+      id: `HIST-${Date.now()}`,
+      requirementId: result.requirementId || requirementId || 'JIRA-REQ',
+      title: brdText.split('\n')[0].replace(/^Requirement:\s*/, '') || 'Multi-Agent Orchestration',
+      status: result.status === 'Failed' ? 'Failed' : 'Completed',
+      confidence: result.stats?.confidence || '97%',
+      impactedFiles: result.impactedFiles?.length || 4,
+      timestamp: 'Just now',
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Orchestration Controller Error:', error);
+    return res.status(500).json({ error: 'Failed to execute multi-agent workflow.' });
+  }
+};
+
+/**
+ * Retrieve execution status by execution ID
+ */
+export const handleGetExecutionStatus = (req, res) => {
+  const { executionId } = req.params;
+  const status = getExecutionStatus(executionId);
+  if (!status) {
+    return res.status(404).json({ error: `Execution ID '${executionId}' not found.` });
+  }
+  return res.status(200).json(status);
 };
 
 export const handlePreReview = async (req, res) => {

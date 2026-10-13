@@ -22,38 +22,47 @@
   justify-content: flex-start;
 }
 
+/* Atmospheric depth layers — cyan right, lime bottom, dark centre for text */
 .ih-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 50% at 75% 60%, rgba(0,200,160,0.06) 0%, transparent 65%),
-    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(118,185,0,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 70% at 30% 45%, rgba(5,10,15,0.55) 0%, transparent 80%);
+    radial-gradient(ellipse 65% 55% at 78% 60%, rgba(0,200,160,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 35% at 50% 102%, rgba(118,185,0,0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 65% at 28% 48%, rgba(5,10,15,0.42) 0%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
 
+/* Floating lime orb — decorative depth object top-left */
 .ih-hero::after {
   content: '';
   position: absolute;
-  width: 600px;
-  height: 600px;
+  width: 520px;
+  height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(118, 185, 0, 0.07) 0%, transparent 70%);
-  top: -100px;
-  left: -80px;
+  background: radial-gradient(circle, rgba(118,185,0,0.10) 0%, rgba(118,185,0,0.03) 45%, transparent 70%);
+  top: -120px;
+  left: -100px;
   pointer-events: none;
+  z-index: 0;
 }
 @media (prefers-reduced-motion: no-preference) {
   .ih-hero::after { animation: floatY 20s ease-in-out infinite; }
 }
 
-/* Subtle dark scrim only behind the text block */
+/* Scrim — much lighter so the artwork behind reads clearly */
 .ih-hero-scrim {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 30% 50%, rgba(0,0,0,0.45) 0%, transparent 100%);
+  /* only a gentle darkness on the left third where text lives */
+  background: linear-gradient(
+    to right,
+    rgba(5,10,15,0.38) 0%,
+    rgba(5,10,15,0.18) 30%,
+    rgba(5,10,15,0) 55%
+  );
   pointer-events: none;
   z-index: 0;
 }
@@ -296,35 +305,57 @@
 }
 
 /* Cards grid */
+/* Cards grid */
 .ih-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px;
 }
 
 .ih-card {
+  /* Layered surface: brighter top fading down — lit-from-above slab */
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 60%),
-    linear-gradient(145deg, rgba(30,36,50,0.97) 0%, rgba(18,24,36,0.99) 100%);
-  border: 1px solid rgba(118, 185, 0, 0.12);
+    linear-gradient(180deg,
+      rgba(255,255,255,0.055) 0%,
+      rgba(255,255,255,0.015) 35%,
+      transparent             100%
+    ),
+    linear-gradient(150deg,
+      rgba(32, 40, 58, 0.98) 0%,
+      rgba(16, 22, 36, 0.99) 100%
+    );
+  /* Differentiated borders: bright top, lime bottom edge for ground separation */
+  border-top:    1px solid rgba(255,255,255,0.10);
+  border-left:   1px solid rgba(118,185,0,0.16);
+  border-right:  1px solid rgba(118,185,0,0.10);
+  border-bottom: 1px solid rgba(118,185,0,0.28);
   border-radius: 14px;
-  padding: 20px 22px;
+  padding: 22px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.12s ease-out, box-shadow 0.18s ease, border-color 0.18s ease;
   position: relative;
   overflow: hidden;
-  transform: perspective(900px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)) translateZ(0);
   will-change: transform;
+  /* Default resting tilt — cards appear raised even before hover */
+  transform: perspective(900px)
+    rotateX(var(--ty, 2deg))
+    rotateY(var(--tx, -1.5deg))
+    translateZ(0);
+  transition: transform 0.16s ease-out, box-shadow 0.20s ease, border-color 0.20s ease;
+  /* Multi-layer shadow system — visible on dark backgrounds */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 4px 20px rgba(0, 0, 0, 0.5),
-    0 1px 0 rgba(118, 185, 0, 0.05);
+    0 2px  4px rgba(0,0,0,0.55),
+    0 6px 16px rgba(0,0,0,0.50),
+    0 14px 32px rgba(0,0,0,0.38),
+    0 0 0 1px rgba(118,185,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    inset 0 -2px 6px rgba(0,0,0,0.35);
 }
 
+/* Top lime-to-cyan edge bar — always visible at resting state */
 .ih-card::before {
   content: '';
   position: absolute;
@@ -332,11 +363,12 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(to right, #76b900 0%, rgba(118, 185, 0, 0.2) 50%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.15s;
+  background: linear-gradient(to right, rgba(118,185,0,0.7) 0%, rgba(0,200,160,0.5) 50%, transparent 85%);
+  opacity: 0.55;
+  transition: opacity 0.18s;
 }
 
+/* Shimmer sweep on hover */
 .ih-card::after {
   content: '';
   position: absolute;
@@ -348,11 +380,11 @@
     105deg,
     transparent 0%,
     rgba(255,255,255,0.03) 40%,
-    rgba(255,255,255,0.06) 50%,
+    rgba(255,255,255,0.07) 50%,
     rgba(255,255,255,0.03) 60%,
     transparent 100%
   );
-  transition: left 0.45s ease;
+  transition: left 0.48s ease;
   pointer-events: none;
 }
 
@@ -361,13 +393,23 @@
 }
 
 .ih-card:hover {
-  border-color: rgba(118, 185, 0, 0.4);
+  border-top:    1px solid rgba(255,255,255,0.14);
+  border-left:   1px solid rgba(118,185,0,0.38);
+  border-right:  1px solid rgba(118,185,0,0.22);
+  border-bottom: 1px solid rgba(118,185,0,0.52);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 8px 40px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(118, 185, 0, 0.15),
-    0 0 32px rgba(118, 185, 0, 0.08);
-  transform: perspective(900px) rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)) translateY(-4px) translateZ(8px);
+    0 4px  8px  rgba(0,0,0,0.60),
+    0 12px 28px rgba(0,0,0,0.55),
+    0 24px 56px rgba(0,0,0,0.40),
+    0  0   0 1px rgba(118,185,0,0.22),
+    0  0  28px  rgba(118,185,0,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.28);
+  transform: perspective(900px)
+    rotateX(var(--ty, 2deg))
+    rotateY(var(--tx, -1.5deg))
+    translateY(-8px)
+    translateZ(14px);
 }
 
 .ih-card:hover::before {
@@ -375,12 +417,17 @@
 }
 
 .ih-card:active {
-  transform: perspective(900px) rotateX(var(--ty,0deg)) rotateY(var(--tx,0deg)) translateY(-1px) translateZ(3px) scale(0.99);
+  transform: perspective(900px)
+    rotateX(var(--ty, 2deg))
+    rotateY(var(--tx, -1.5deg))
+    translateY(-3px)
+    translateZ(5px)
+    scale(0.99);
 }
 
 .ih-card:focus-visible {
   outline: 2px solid #76b900;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .ih-card-header {
@@ -391,12 +438,17 @@
 
 .ih-card-icon {
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, rgba(118, 185, 0, 0.15) 0%, rgba(0, 200, 160, 0.1) 100%);
-  border: 1px solid rgba(118, 185, 0, 0.25);
-  box-shadow: 0 0 16px rgba(118, 185, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  /* Visible holographic gradient even at rest */
+  background: linear-gradient(135deg, rgba(118,185,0,0.22) 0%, rgba(0,200,160,0.16) 100%);
+  border: 1px solid rgba(118,185,0,0.40);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 0 12px rgba(118,185,0,0.18),
+    0 2px  8px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -408,10 +460,14 @@
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(118,185,0,0.6) 0%, rgba(0,200,160,0.4) 50%, rgba(118,185,0,0.2) 100%);
+  border-radius: 11px;
+  background: linear-gradient(135deg,
+    rgba(118,185,0,0.55) 0%,
+    rgba(0,200,160,0.40) 50%,
+    rgba(118,185,0,0.20) 100%
+  );
   z-index: -1;
-  opacity: 0;
+  opacity: 0.35;
   transition: opacity 0.2s;
 }
 
@@ -454,6 +510,21 @@
   .ih-card:nth-child(1) { animation-delay: 0.05s; }
   .ih-card:nth-child(2) { animation-delay: 0.12s; }
   .ih-card:nth-child(3) { animation-delay: 0.19s; }
+}
+
+/* Reduced-motion: keep cards fully visible, no tilt, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .ih-card {
+    transform: none;
+    animation: none;
+    opacity: 1;
+  }
+  .ih-card:hover {
+    transform: none;
+  }
+  .ih-card:active {
+    transform: none;
+  }
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */

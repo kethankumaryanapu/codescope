@@ -1,16 +1,62 @@
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import mongoose from 'mongoose';
 import { User } from '../models/User.js';
 import { sendEmailNotification } from '../services/notificationService.js';
+import { signUserToken, verifyUserToken } from '../middleware/authMiddleware.js';
 
 // OTP storage for registration email verification: email -> { otp, expiresAt, name }
 const registrationOTPs = new Map();
 
-// In-Memory User Registry Fallback
+/**
+ * Hash a plaintext password with bcrypt using 10 salt rounds.
+ * @param {string} plain
+ * @returns {Promise<string>}
+ */
+export const hashPassword = async (plain) => {
+  if (!plain || typeof plain !== 'string') {
+    throw new Error('Password must be a non-empty string');
+  }
+  return bcrypt.hash(plain, 10);
+};
+
+/**
+ * Verify a plaintext password against a stored bcrypt hash or legacy plaintext.
+ * Safely handles legacy plaintext values using constant-time comparison during transition.
+ * 
+ * @param {string} plainPassword
+ * @param {string} storedHashOrPlain
+ * @returns {Promise<boolean>}
+ */
+export const verifyPassword = async (plainPassword, storedHashOrPlain) => {
+  if (!plainPassword || !storedHashOrPlain) return false;
+
+  // Standard bcrypt hash format starts with $2a$ or $2b$
+  if (storedHashOrPlain.startsWith('$2a$') || storedHashOrPlain.startsWith('$2b$')) {
+    return bcrypt.compare(plainPassword, storedHashOrPlain);
+  }
+
+  // Legacy transition handling with constant-time equality check
+  try {
+    const bufA = Buffer.from(plainPassword);
+    const bufB = Buffer.from(storedHashOrPlain);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
+};
+
+// Pre-hashed default password for in-memory developer accounts
+const DEFAULT_HASH = bcrypt.hashSync('password123', 10);
+
+// In-Memory User Registry Fallback (passwords stored as cryptographic bcrypt hashes)
 const inMemoryUsers = [
   {
     id: 'usr-1',
     name: 'Abhiram Sadgun',
     email: 'abhiram@codescope.ai',
-    password: 'password123',
+    password: DEFAULT_HASH,
     role: 'Senior Staff Engineer',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
     githubUsername: 'abhiramsadgun94',
@@ -21,7 +67,7 @@ const inMemoryUsers = [
     id: 'usr-2',
     name: 'Alex Rivera',
     email: 'developer@codescope.ai',
-    password: 'password123',
+    password: DEFAULT_HASH,
     role: 'Full Stack Developer',
     avatar: '',
     githubUsername: 'alexrivera',
@@ -52,13 +98,15 @@ export const handleSendRegistrationOTP = async (req, res) => {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
 
-    try {
-      const existingInDb = await User.findOne({ email: normalizedEmail });
-      if (existingInDb) {
-        return res.status(409).json({ error: 'An account with this email already exists.' });
+    if (mongoose.connection?.readyState === 1) {
+      try {
+        const existingInDb = await User.findOne({ email: normalizedEmail });
+        if (existingInDb) {
+          return res.status(409).json({ error: 'An account with this email already exists.' });
+        }
+      } catch {
+        // DB check fallback
       }
-    } catch {
-      // DB check fallback
     }
 
     // Generate secure 6-digit numeric OTP
@@ -112,13 +160,13 @@ export const handleSendRegistrationOTP = async (req, res) => {
     });
   } catch (error) {
     console.error('Send Registration OTP Error:', error);
-    return res.status(500).json({ error: 'Failed to generate registration verification code.' });
+    return res.status(500).json({ error: 'Failed to dispatch registration OTP.' });
   }
 };
 
 /**
  * POST /api/auth/verify-and-register
- * Verifies submitted 6-digit OTP and finalizes user account creation.
+ * Verifies submitted 6-digit OTP, securely hashes password, and finalizes account creation.
  */
 export const handleVerifyAndRegister = async (req, res) => {
   try {
@@ -149,12 +197,15 @@ export const handleVerifyAndRegister = async (req, res) => {
     // OTP Verified! Clear pending record
     registrationOTPs.delete(normalizedEmail);
 
+    // Securely hash password
+    const hashedPassword = await hashPassword(password);
+
     // Create User
     const newUser = {
       id: `usr-${Date.now()}`,
       name: name.trim(),
       email: normalizedEmail,
-      password,
+      password: hashedPassword,
       role: role || 'Software Engineer',
       avatar: '',
       isEmailVerified: true,
@@ -165,16 +216,23 @@ export const handleVerifyAndRegister = async (req, res) => {
     currentUser = newUser;
 
     // Persist to MongoDB if connected
-    try {
-      await User.create({
-        name: newUser.name,
-        email: newUser.email,
-        password: newUser.password,
-        role: newUser.role,
-      });
-    } catch {
-      // In-memory fallback
+    if (mongoose.connection?.readyState === 1) {
+      try {
+        const dbDoc = await User.create({
+          name: newUser.name,
+          email: newUser.email,
+          password: hashedPassword,
+          role: newUser.role,
+        });
+        if (dbDoc && dbDoc._id) {
+          newUser.id = dbDoc._id.toString();
+        }
+      } catch {
+        // In-memory fallback
+      }
     }
+
+    const token = signUserToken(newUser);
 
     return res.status(201).json({
       message: 'Email verified and account registered successfully.',
@@ -185,7 +243,7 @@ export const handleVerifyAndRegister = async (req, res) => {
         role: newUser.role,
         avatar: newUser.avatar,
       },
-      token: `jwt-mock-${newUser.id}`,
+      token,
     });
   } catch (error) {
     console.error('Verify & Register Error:', error);
@@ -258,7 +316,7 @@ export const handleForgotPassword = async (req, res) => {
 
 /**
  * POST /api/auth/reset-password
- * Verifies recovery OTP and updates password.
+ * Verifies recovery OTP and updates password using bcrypt hash.
  */
 export const handleResetPassword = async (req, res) => {
   try {
@@ -286,37 +344,42 @@ export const handleResetPassword = async (req, res) => {
     // OTP Verified
     registrationOTPs.delete(`reset_${normalizedEmail}`);
 
+    // Securely hash the new password
+    const hashedPassword = await hashPassword(newPassword);
+
     // Update in MongoDB
-    try {
-      const updated = await User.findOneAndUpdate(
-        { email: normalizedEmail },
-        { $set: { password: newPassword } },
-        { new: true, upsert: true }
-      );
-      if (updated && !inMemoryUsers.some((u) => u.email.toLowerCase() === normalizedEmail)) {
-        inMemoryUsers.push({
-          id: updated._id.toString(),
-          name: updated.name || 'Developer',
-          email: normalizedEmail,
-          password: newPassword,
-          role: updated.role || 'Senior Developer',
-          avatar: '',
-        });
+    if (mongoose.connection?.readyState === 1) {
+      try {
+        const updated = await User.findOneAndUpdate(
+          { email: normalizedEmail },
+          { $set: { password: hashedPassword } },
+          { new: true, upsert: true }
+        );
+        if (updated && !inMemoryUsers.some((u) => u.email.toLowerCase() === normalizedEmail)) {
+          inMemoryUsers.push({
+            id: updated._id.toString(),
+            name: updated.name || 'Developer',
+            email: normalizedEmail,
+            password: hashedPassword,
+            role: updated.role || 'Senior Developer',
+            avatar: '',
+          });
+        }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
     }
 
     // Update in-memory user
     const memUser = inMemoryUsers.find((u) => u.email.toLowerCase() === normalizedEmail);
     if (memUser) {
-      memUser.password = newPassword;
+      memUser.password = hashedPassword;
     } else {
       inMemoryUsers.push({
         id: `usr-${Date.now()}`,
         name: 'Developer',
         email: normalizedEmail,
-        password: newPassword,
+        password: hashedPassword,
         role: 'Senior Developer',
         avatar: '',
       });
@@ -329,6 +392,10 @@ export const handleResetPassword = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/register
+ * Direct registration endpoint with bcrypt password hashing.
+ */
 export const handleRegister = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -344,11 +411,13 @@ export const handleRegister = async (req, res) => {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
 
+    const hashedPassword = await hashPassword(password);
+
     const newUser = {
       id: `usr-${Date.now()}`,
       name: name.trim(),
       email: normalizedEmail,
-      password,
+      password: hashedPassword,
       role: role || 'Software Engineer',
       avatar: '',
       createdAt: new Date().toISOString(),
@@ -358,14 +427,23 @@ export const handleRegister = async (req, res) => {
     currentUser = newUser;
 
     // Try saving to DB if connected
-    try {
-      const dbDoc = await User.create({ name: newUser.name, email: newUser.email, password: newUser.password, role: newUser.role });
-      if (dbDoc && dbDoc._id) {
-        newUser.id = dbDoc._id.toString();
+    if (mongoose.connection?.readyState === 1) {
+      try {
+        const dbDoc = await User.create({
+          name: newUser.name,
+          email: newUser.email,
+          password: hashedPassword,
+          role: newUser.role,
+        });
+        if (dbDoc && dbDoc._id) {
+          newUser.id = dbDoc._id.toString();
+        }
+      } catch {
+        // Fall back safely to in-memory user
       }
-    } catch {
-      // Fall back safely to in-memory user
     }
+
+    const token = signUserToken(newUser);
 
     return res.status(201).json({
       message: 'Registration successful',
@@ -376,7 +454,7 @@ export const handleRegister = async (req, res) => {
         role: newUser.role,
         avatar: newUser.avatar,
       },
-      token: `jwt-mock-${newUser.id}`,
+      token,
     });
   } catch (error) {
     console.error('Register Error:', error);
@@ -384,6 +462,11 @@ export const handleRegister = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/login
+ * Authenticates user, verifies password via bcrypt, auto-upgrades legacy passwords,
+ * and issues a signed cryptographic JWT.
+ */
 export const handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -396,30 +479,49 @@ export const handleLogin = async (req, res) => {
 
     // 1. Try finding in MongoDB first
     let matchedUser = null;
-    try {
-      const dbUser = await User.findOne({ email: normalizedEmail });
-      if (dbUser && dbUser.password === password) {
-        matchedUser = {
-          id: dbUser._id.toString(),
-          name: dbUser.name,
-          email: dbUser.email,
-          role: dbUser.role || 'Senior Developer',
-          avatar: dbUser.avatar || '',
-          githubUsername: dbUser.githubUsername || '',
-          jiraUsername: dbUser.jiraUsername || '',
-        };
+    let needsUpgrade = false;
+    let dbUserDoc = null;
+
+    if (mongoose.connection?.readyState === 1) {
+      try {
+        const dbUser = await User.findOne({ email: normalizedEmail });
+        if (dbUser) {
+          const isMatch = await verifyPassword(password, dbUser.password);
+          if (isMatch) {
+            matchedUser = {
+              id: dbUser._id.toString(),
+              name: dbUser.name,
+              email: dbUser.email,
+              role: dbUser.role || 'Senior Developer',
+              avatar: dbUser.avatar || '',
+              githubUsername: dbUser.githubUsername || '',
+              jiraUsername: dbUser.jiraUsername || '',
+            };
+            if (!dbUser.password.startsWith('$2a$') && !dbUser.password.startsWith('$2b$')) {
+              needsUpgrade = true;
+              dbUserDoc = dbUser;
+            }
+          }
+        }
+      } catch (dbErr) {
+        console.warn('[Auth Login] DB lookup warning:', dbErr.message);
       }
-    } catch (dbErr) {
-      console.warn('[Auth Login] DB lookup warning:', dbErr.message);
     }
 
     // 2. Try in-memory fallback
     if (!matchedUser) {
-      const memUser = inMemoryUsers.find(
-        (u) => u.email.toLowerCase() === normalizedEmail && u.password === password
-      );
-      if (memUser) {
-        matchedUser = memUser;
+      for (const u of inMemoryUsers) {
+        if (u.email.toLowerCase() === normalizedEmail) {
+          const isMatch = await verifyPassword(password, u.password);
+          if (isMatch) {
+            matchedUser = u;
+            // Upgrade legacy in-memory password if needed
+            if (!u.password.startsWith('$2a$') && !u.password.startsWith('$2b$')) {
+              u.password = await hashPassword(password);
+            }
+            break;
+          }
+        }
       }
     }
 
@@ -427,7 +529,19 @@ export const handleLogin = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
+    // Auto-upgrade legacy plaintext in MongoDB to bcrypt hash
+    if (needsUpgrade && dbUserDoc) {
+      try {
+        const upgradedHash = await hashPassword(password);
+        await User.updateOne({ _id: dbUserDoc._id }, { $set: { password: upgradedHash } });
+        console.log(`[Auth Security] ✅ Auto-upgraded legacy password to bcrypt for ${normalizedEmail}`);
+      } catch (upgradeErr) {
+        console.warn('[Auth Security] Upgrade warning:', upgradeErr.message);
+      }
+    }
+
     currentUser = matchedUser;
+    const token = signUserToken(matchedUser);
 
     return res.status(200).json({
       message: 'Login successful',
@@ -437,8 +551,10 @@ export const handleLogin = async (req, res) => {
         email: matchedUser.email,
         role: matchedUser.role,
         avatar: matchedUser.avatar || '',
+        githubUsername: matchedUser.githubUsername || '',
+        jiraUsername: matchedUser.jiraUsername || '',
       },
-      token: `jwt-mock-${matchedUser.id || matchedUser._id}`,
+      token,
     });
   } catch (error) {
     console.error('Login Error:', error);
@@ -446,58 +562,112 @@ export const handleLogin = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/auth/me or GET /api/me
+ * Returns the currently authenticated user based on JWT verification.
+ */
 export const handleGetMe = async (req, res) => {
-  return res.status(200).json({
-    user: {
-      id: currentUser.id,
-      name: currentUser.name,
-      email: currentUser.email,
-      role: currentUser.role,
-      avatar: currentUser.avatar,
-      githubUsername: currentUser.githubUsername || '',
-      jiraUsername:   currentUser.jiraUsername   || '',
-    },
+  // 1. If user was attached by requireAuth or optionalAuth middleware
+  if (req.user) {
+    return res.status(200).json({
+      user: {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+        avatar: req.user.avatar || '',
+        githubUsername: req.user.githubUsername || '',
+        jiraUsername: req.user.jiraUsername || '',
+      },
+    });
+  }
+
+  // 2. Direct token verification from Authorization header
+  const authHeader = req.headers['authorization'] || req.headers['x-access-token'];
+  if (authHeader) {
+    const verified = verifyUserToken(authHeader);
+    if (verified.valid && verified.payload) {
+      return res.status(200).json({
+        user: {
+          id: verified.payload.id,
+          name: verified.payload.name,
+          email: verified.payload.email,
+          role: verified.payload.role,
+          avatar: verified.payload.avatar || '',
+          githubUsername: verified.payload.githubUsername || '',
+          jiraUsername: verified.payload.jiraUsername || '',
+        },
+      });
+    }
+  }
+
+  // 3. Fallback to active developer session in non-production environments
+  if (process.env.NODE_ENV !== 'production' && currentUser) {
+    return res.status(200).json({
+      user: {
+        id: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        role: currentUser.role,
+        avatar: currentUser.avatar,
+        githubUsername: currentUser.githubUsername || '',
+        jiraUsername: currentUser.jiraUsername || '',
+      },
+    });
+  }
+
+  return res.status(401).json({
+    error: 'Authentication required. Authorization header missing or invalid.',
+    authRequired: true,
   });
 };
 
 /**
  * PATCH /api/me/integrations
  * Saves the user's GitHub and Jira usernames.
- * These are used by webhook handlers to route notifications to the correct user.
  */
 export const handleUpdateIntegrations = async (req, res) => {
   try {
     const { githubUsername, jiraUsername } = req.body;
+    const targetEmail = req.user?.email || currentUser?.email;
 
-    // Update in-memory current user
-    currentUser.githubUsername = (githubUsername || '').trim();
-    currentUser.jiraUsername   = (jiraUsername   || '').trim();
-
-    const memIdx = inMemoryUsers.findIndex((u) => u.email.toLowerCase() === currentUser.email.toLowerCase());
-    if (memIdx >= 0) {
-      inMemoryUsers[memIdx] = { ...inMemoryUsers[memIdx], githubUsername: currentUser.githubUsername, jiraUsername: currentUser.jiraUsername };
-    } else {
-      inMemoryUsers.push({ ...currentUser });
+    if (!targetEmail) {
+      return res.status(401).json({ error: 'Authentication required to update integrations.' });
     }
 
-    // Also persist to MongoDB if available
+    const cleanGithub = (githubUsername || '').trim();
+    const cleanJira = (jiraUsername || '').trim();
+
+    // Update in-memory user
+    const memIdx = inMemoryUsers.findIndex((u) => u.email.toLowerCase() === targetEmail.toLowerCase());
+    if (memIdx >= 0) {
+      inMemoryUsers[memIdx].githubUsername = cleanGithub;
+      inMemoryUsers[memIdx].jiraUsername = cleanJira;
+    }
+
+    if (currentUser && currentUser.email.toLowerCase() === targetEmail.toLowerCase()) {
+      currentUser.githubUsername = cleanGithub;
+      currentUser.jiraUsername = cleanJira;
+    }
+
+    // Persist to MongoDB if available
     try {
       await User.updateOne(
-        { email: currentUser.email },
-        { $set: { githubUsername: currentUser.githubUsername, jiraUsername: currentUser.jiraUsername } }
+        { email: targetEmail },
+        { $set: { githubUsername: cleanGithub, jiraUsername: cleanJira } }
       );
     } catch {
-      // MongoDB may not have this user yet — in-memory update is sufficient
+      // MongoDB may not be connected
     }
 
-    console.log(`[Auth] Updated integrations for ${currentUser.email}: GitHub=@${currentUser.githubUsername}, Jira=${currentUser.jiraUsername}`);
+    console.log(`[Auth] Updated integrations for ${targetEmail}: GitHub=@${cleanGithub}, Jira=${cleanJira}`);
 
     return res.status(200).json({
       message: 'Integration usernames updated successfully',
       user: {
-        email:          currentUser.email,
-        githubUsername: currentUser.githubUsername,
-        jiraUsername:   currentUser.jiraUsername,
+        email: targetEmail,
+        githubUsername: cleanGithub,
+        jiraUsername: cleanJira,
       },
     });
   } catch (error) {
@@ -517,5 +687,3 @@ export const findUserByGithubUsername = (username) => {
     ) || null
   );
 };
-
-

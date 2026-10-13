@@ -15,6 +15,7 @@ function stateColor(state) {
   if (s === 'completed') return '#76b900';
   if (s === 'ready') return '#4a9eff';
   if (s === 'failed') return '#cc3333';
+  if (s === 'skipped') return '#64748b';
   return '#333333';
 }
 
@@ -24,6 +25,7 @@ function stateTextColor(state) {
   if (s === 'running' || s === 'completed') return '#76b900';
   if (s === 'ready') return '#4a9eff';
   if (s === 'failed') return '#cc3333';
+  if (s === 'skipped') return '#64748b';
   return '#606060';
 }
 
@@ -100,13 +102,13 @@ const IntelligenceCore = ({ size = 380 }) => {
         filter={isActive ? 'url(#greenGlow)' : undefined}
       />
 
-      <text x={cx} y={cy - 6} textAnchor="middle" fill={isActive ? '#76b900' : '#606060'} fontSize="9" fontWeight="700" fontFamily="var(--font-mono)" letterSpacing="1">
-        IMPACT
+      <text x={cx} y={cy - 6} textAnchor="middle" fill={isActive ? '#76b900' : '#d1d5db'} fontSize="9" fontWeight="700" fontFamily="var(--font-mono)" letterSpacing="1">
+        CODE
       </text>
-      <text x={cx} y={cy + 7} textAnchor="middle" fill={isActive ? '#76b900' : '#606060'} fontSize="9" fontWeight="700" fontFamily="var(--font-mono)" letterSpacing="1">
-        IQ
+      <text x={cx} y={cy + 7} textAnchor="middle" fill={isActive ? '#76b900' : '#d1d5db'} fontSize="9" fontWeight="700" fontFamily="var(--font-mono)" letterSpacing="1">
+        SCOPE
       </text>
-      <text x={cx} y={cy + 20} textAnchor="middle" fill={isActive ? '#76b900' : '#2a2a2a'} fontSize="7" fontFamily="var(--font-mono)">
+      <text x={cx} y={cy + 20} textAnchor="middle" fill={isActive ? '#76b900' : '#8b949e'} fontSize="7.5" fontFamily="var(--font-mono)">
         {isActive ? 'PROCESSING' : `${progress}%`}
       </text>
 

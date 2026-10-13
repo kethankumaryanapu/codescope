@@ -39,55 +39,126 @@ import { generateImpactPrimer, generatePreReview } from '../services/geminiServi
 // ─── SIGNATURE VERIFICATION HELPERS ──────────────────────────────────────────
 
 /**
- * Verifies GitHub's HMAC-SHA256 webhook signature.
+ * Verifies GitHub's HMAC-SHA256 webhook signature with constant-time comparison.
  * GitHub sends the signature in the "X-Hub-Signature-256" header.
+ * 
+ * @param {string|Buffer|object} rawBody - Request body
+ * @param {string} signature - Value of X-Hub-Signature-256 header
+ * @returns {boolean}
  */
-const verifyGitHubSignature = (rawBody, signature) => {
+export const verifyGitHubSignature = (rawBody, signature) => {
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
-  if (!secret) return true; // Skip verification if secret not configured (dev mode)
 
-  const expected = `sha256=${crypto
-    .createHmac('sha256', secret)
-    .update(rawBody)
-    .digest('hex')}`;
+  // Safe behavior when secret is not configured:
+  // - In production or when STRICT_WEBHOOK_VERIFICATION is enabled: strictly reject
+  // - In development/testing: permit unsigned requests with clear console warning
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production' || process.env.STRICT_WEBHOOK_VERIFICATION === 'true') {
+      console.warn('[Webhook/GitHub] ⚠️ GITHUB_WEBHOOK_SECRET is not configured in production mode. Rejecting webhook for safety.');
+      return false;
+    }
+    return true;
+  }
+
+  if (!signature || typeof signature !== 'string') {
+    return false;
+  }
 
   try {
-    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature || ''));
+    const bodyPayload = Buffer.isBuffer(rawBody)
+      ? rawBody
+      : typeof rawBody === 'string'
+      ? rawBody
+      : JSON.stringify(rawBody);
+
+    const expected = `sha256=${crypto
+      .createHmac('sha256', secret)
+      .update(bodyPayload)
+      .digest('hex')}`;
+
+    const bufExpected = Buffer.from(expected, 'utf8');
+    const bufActual = Buffer.from(signature.trim(), 'utf8');
+
+    if (bufExpected.length !== bufActual.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(bufExpected, bufActual);
+  } catch (err) {
+    console.warn('[Webhook/GitHub] Signature check error:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Verifies GitLab's webhook token using constant-time comparison.
+ * GitLab sends the token in the "X-Gitlab-Token" header.
+ * 
+ * @param {string} token
+ * @returns {boolean}
+ */
+export const verifyGitLabToken = (token) => {
+  const secret = process.env.GITLAB_WEBHOOK_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production' || process.env.STRICT_WEBHOOK_VERIFICATION === 'true') {
+      return false;
+    }
+    return true;
+  }
+
+  if (!token || typeof token !== 'string') return false;
+
+  try {
+    const bufToken = Buffer.from(token.trim(), 'utf8');
+    const bufSecret = Buffer.from(secret.trim(), 'utf8');
+    if (bufToken.length !== bufSecret.length) return false;
+    return crypto.timingSafeEqual(bufToken, bufSecret);
   } catch {
     return false;
   }
 };
 
 /**
- * Verifies GitLab's webhook token.
- * GitLab sends the token in the "X-Gitlab-Token" header.
- */
-const verifyGitLabToken = (token) => {
-  const secret = process.env.GITLAB_WEBHOOK_SECRET;
-  if (!secret) return true;
-  return token === secret;
-};
-
-/**
- * Verifies Stripe's webhook signature.
+ * Verifies Stripe's webhook signature using constant-time comparison.
  * Stripe sends the signature in the "Stripe-Signature" header.
+ * 
+ * @param {string|Buffer} rawBody
+ * @param {string} signature
+ * @returns {boolean}
  */
-const verifyStripeSignature = (rawBody, signature) => {
+export const verifyStripeSignature = (rawBody, signature) => {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) return true;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production' || process.env.STRICT_WEBHOOK_VERIFICATION === 'true') {
+      return false;
+    }
+    return true;
+  }
+
+  if (!signature || typeof signature !== 'string') return false;
 
   try {
     const parts = signature.split(',');
-    const timestamp = parts.find((p) => p.startsWith('t=')).split('=')[1];
-    const v1 = parts.find((p) => p.startsWith('v1=')).split('=')[1];
+    const timestampPart = parts.find((p) => p.startsWith('t='));
+    const v1Part = parts.find((p) => p.startsWith('v1='));
 
-    const signedPayload = `${timestamp}.${rawBody}`;
+    if (!timestampPart || !v1Part) return false;
+
+    const timestamp = timestampPart.split('=')[1];
+    const v1 = v1Part.split('=')[1];
+
+    const bodyPayload = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : String(rawBody);
+    const signedPayload = `${timestamp}.${bodyPayload}`;
     const expected = crypto
       .createHmac('sha256', secret)
       .update(signedPayload)
       .digest('hex');
 
-    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(v1));
+    const bufExpected = Buffer.from(expected, 'utf8');
+    const bufActual = Buffer.from(v1, 'utf8');
+
+    if (bufExpected.length !== bufActual.length) return false;
+    return crypto.timingSafeEqual(bufExpected, bufActual);
   } catch {
     return false;
   }

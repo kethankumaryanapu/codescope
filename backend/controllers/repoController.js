@@ -7,7 +7,13 @@ import {
   batchAddExplicitFiles,
   removeExplicitFile,
   clearAllRepoFiles,
+  resolveValidatedRepoPath,
+  updateRepoPythonIndexStatus,
+  isRepoAlreadyIndexed,
 } from '../services/codeIndexer.js';
+import {
+  triggerPythonRepoIndex,
+} from '../services/pythonAgentService.js';
 
 let analysisHistory = [
   {
@@ -48,12 +54,74 @@ export const handleGetRepositories = (req, res) => {
   return res.status(200).json({ repositories: repos });
 };
 
-export const handleScanRepository = (req, res) => {
-  const { repoId } = req.body;
-  const result = indexRepository(repoId || 'repo-1');
+export const handleScanRepository = async (req, res) => {
+  const { repoId, forceReindex } = req.body || {};
+  const targetRepoId = repoId || 'repo-1';
+
+  // 1. Run local synchronous AST scan (preserves existing index logic and calculations)
+  const result = indexRepository(targetRepoId);
+  const repo = result.repo;
+
+  // 2. Validate repository filesystem path strictly against internal catalog
+  const pathValidation = resolveValidatedRepoPath(targetRepoId);
+  if (!pathValidation.valid) {
+    return res.status(200).json({
+      message: 'Repository AST scan complete',
+      ...result,
+      pythonIndexing: {
+        success: false,
+        status: 'skipped',
+        error: pathValidation.error || 'Repository path is inaccessible or does not exist on filesystem',
+        chunksStored: 0,
+      },
+    });
+  }
+
+  // 3. Avoid duplicate indexing if safe:
+  // If already indexed in this session and forceReindex is not requested, skip re-embedding
+  if (isRepoAlreadyIndexed(repo.id) && !forceReindex) {
+    return res.status(200).json({
+      message: 'Repository AST scan complete',
+      ...result,
+      pythonIndexing: {
+        success: true,
+        status: 'already_indexed',
+        skippedDuplicate: true,
+        chunksStored: repo.pythonChunksStored || 0,
+        collectionName: repo.pythonCollectionName || 'code_chunks',
+        lastIndexedAt: repo.pythonIndexedAt,
+      },
+    });
+  }
+
+  // 4. Trigger Python multi-agent indexing pipeline with validated path
+  const pyResult = await triggerPythonRepoIndex(pathValidation.path);
+
+  // 5. Update repo metadata ONLY if Python confirms success
+  if (pyResult.success && pyResult.chunksStored > 0) {
+    updateRepoPythonIndexStatus(repo.id, {
+      success: true,
+      indexedAt: pyResult.indexedAt,
+      chunksStored: pyResult.chunksStored,
+      collectionName: pyResult.collectionName,
+    });
+  }
+
+  // 6. Return response preserving frontend contracts and adding clear indexing status
   return res.status(200).json({
     message: 'Repository AST scan complete',
     ...result,
+    pythonIndexing: {
+      success: pyResult.success,
+      status: pyResult.status,
+      chunksStored: pyResult.chunksStored || 0,
+      filesParsed: pyResult.filesParsed || 0,
+      collectionName: pyResult.collectionName || 'code_chunks',
+      durationMs: pyResult.durationMs,
+      indexedAt: pyResult.indexedAt,
+      ...(pyResult.error ? { error: pyResult.error } : {}),
+      ...(pyResult.endpoint ? { endpoint: pyResult.endpoint } : {}),
+    },
   });
 };
 
@@ -136,6 +204,9 @@ export const handleDeleteExplicitFile = (req, res) => {
   }
 
   const result = removeExplicitFile(repoId, fileIdentifier);
+  if (!result.success && result.error) {
+    return res.status(400).json({ error: result.error });
+  }
   return res.status(200).json({
     message: 'File removed from index registry',
     ...result,

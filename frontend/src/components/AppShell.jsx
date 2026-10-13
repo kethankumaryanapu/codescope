@@ -59,10 +59,9 @@ const BgSvgLayer = () => {
             stroke={isLime ? 'rgba(118,185,0,0.15)' : 'rgba(0,200,160,0.12)'}
             strokeWidth="0.5"
             strokeDasharray={dashLen}
-            style={{
-              animation: `dashFlow ${dur}s linear infinite`,
-              strokeDashoffset: 0
-            }}
+            strokeDashoffset="0"
+            className="bg-svg-edge"
+            style={{ '--dur': `${dur}s` }}
           />
         );
       })}
@@ -72,7 +71,8 @@ const BgSvgLayer = () => {
           cx={p.x} cy={p.y} r={p.r}
           fill={p.c}
           opacity={p.op}
-          style={{ animation: `particleDrift ${p.dur}s ease-in-out infinite` }}
+          className="bg-svg-dot"
+          style={{ '--dur': `${p.dur}s` }}
         />
       ))}
     </svg>

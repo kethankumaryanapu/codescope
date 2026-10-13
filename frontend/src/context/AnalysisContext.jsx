@@ -99,14 +99,16 @@ export const AnalysisProvider = ({ children }) => {
   const [reviewData, setReviewData] = useState(null);
   const [reviewError, setReviewError] = useState(null);
 
-  // Dynamic Agent Workflow Stages
+  // Dynamic Agent Workflow Stages & Execution Telemetry
+  const [executionId, setExecutionId] = useState(null);
+  const [stageDetails, setStageDetails] = useState(null);
   const [workflow, setWorkflow] = useState({
-    coordinator: 'Completed',
-    requirement: 'Completed',
+    coordinator: 'Ready',
+    requirement: 'Ready',
     impact: 'Ready',
     review: 'Waiting',
     pr: 'Waiting',
-    progress: 40,
+    progress: 0,
   });
 
   const loadRepoFiles = useCallback(async (repoId = selectedRepo?.id || 'repo-1') => {
@@ -271,36 +273,54 @@ export const AnalysisProvider = ({ children }) => {
     }
   };
 
-  const runImpactAnalysis = async (text = brdText, repoId = selectedRepo?.id, reqId = requirementId) => {
+  const runImpactAnalysis = async (text = brdText, repoId = selectedRepo?.id, reqId = requirementId, diff = gitDiff) => {
     setIsAnalyzing(true);
     setAnalysisError(null);
 
-    setWorkflow((prev) => ({
-      ...prev,
-      coordinator: 'Completed',
-      requirement: 'Completed',
+    setWorkflow({
+      coordinator: 'Running',
+      requirement: 'Running',
       impact: 'Running',
-      progress: 60,
-    }));
+      review: diff ? 'Waiting' : 'Waiting',
+      pr: 'Waiting',
+      progress: 20,
+    });
 
     try {
-      const data = await analyzeImpact(text, repoId, reqId, repoFiles);
+      const data = await analyzeImpact(text, repoId, reqId, repoFiles, diff);
       setAnalysisData(data);
       setAnalysisResult(data.summaryMarkdown || data.primer);
 
-      setWorkflow((prev) => ({
-        ...prev,
-        impact: 'Completed',
-        review: 'Ready',
-        progress: 75,
-      }));
+      if (data.executionId) {
+        setExecutionId(data.executionId);
+      }
+      if (data.stages) {
+        setStageDetails(data.stages);
+      }
+      if (data.workflow) {
+        setWorkflow(data.workflow);
+      } else {
+        setWorkflow({
+          coordinator: 'Completed',
+          requirement: 'Completed',
+          impact: 'Completed',
+          review: diff ? 'Ready' : 'Skipped',
+          pr: 'Waiting',
+          progress: 60,
+        });
+      }
+
+      if (data.reviewMarkdown) {
+        setReviewData(data);
+        setReviewResult(data.reviewMarkdown);
+      }
 
       // Update history
       const newEntry = {
         id: `HIST-${Date.now()}`,
         requirementId: reqId,
         title: text.split('\n')[0].replace(/^Requirement:\s*/, '') || reqId,
-        status: 'Completed',
+        status: data.status === 'Failed' ? 'Failed' : 'Completed',
         confidence: data.stats?.confidence || '98%',
         impactedFiles: data.impactedFiles?.length || 4,
         timestamp: 'Just now',
@@ -315,7 +335,7 @@ export const AnalysisProvider = ({ children }) => {
       setWorkflow((prev) => ({
         ...prev,
         impact: 'Failed',
-        progress: 50,
+        progress: 30,
       }));
       throw err;
     } finally {
@@ -330,7 +350,7 @@ export const AnalysisProvider = ({ children }) => {
     setWorkflow((prev) => ({
       ...prev,
       review: 'Running',
-      progress: 85,
+      progress: Math.max(prev.progress || 0, 70),
     }));
 
     try {
@@ -338,12 +358,16 @@ export const AnalysisProvider = ({ children }) => {
       setReviewData(data);
       setReviewResult(data.reviewMarkdown || data.reviewResult);
 
-      setWorkflow((prev) => ({
-        ...prev,
-        review: 'Completed',
-        pr: 'Ready',
-        progress: 100,
-      }));
+      if (data.workflow) {
+        setWorkflow(data.workflow);
+      } else {
+        setWorkflow((prev) => ({
+          ...prev,
+          review: 'Completed',
+          pr: 'Ready',
+          progress: 90,
+        }));
+      }
 
       return data;
     } catch (err) {
@@ -352,12 +376,20 @@ export const AnalysisProvider = ({ children }) => {
       setWorkflow((prev) => ({
         ...prev,
         review: 'Failed',
-        progress: 75,
+        progress: 60,
       }));
       throw err;
     } finally {
       setIsReviewing(false);
     }
+  };
+
+  const runFullPipeline = async (options = {}) => {
+    const text = options.text || brdText;
+    const repo = options.repoId || selectedRepo?.id;
+    const req = options.reqId || requirementId;
+    const diff = options.diff !== undefined ? options.diff : gitDiff;
+    return runImpactAnalysis(text, repo, req, diff);
   };
 
   return (
@@ -390,11 +422,14 @@ export const AnalysisProvider = ({ children }) => {
         reviewData,
         reviewError,
         workflow,
+        executionId,
+        stageDetails,
         lastUpdated,
         isLiveSyncing,
         runRepoScan,
         runImpactAnalysis,
         runCodeReview,
+        runFullPipeline,
       }}
     >
       {children}

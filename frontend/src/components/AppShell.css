@@ -463,7 +463,8 @@
 .shell-page-content {
   flex: 1;
   overflow-y: auto;
-  background: rgba(5,10,15,0.52);
+  /* lighter wash so the artwork shows through on every page */
+  background: rgba(5,10,15,0.28);
   min-height: 0;
 }
 

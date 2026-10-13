@@ -68,11 +68,11 @@ app.get('/', (req, res) => {
     message: 'Code Impact Analysis Backend API is running',
     endpoints: {
       impactAnalysis: 'POST /api/impact-analysis',
-      preReview:      'POST /api/pre-review',
+      preReview: 'POST /api/pre-review',
       webhooks: {
         github: 'POST /webhooks/github',
         gitlab: 'POST /webhooks/gitlab',
-        jira:   'POST /webhooks/jira',
+        jira: 'POST /webhooks/jira',
         stripe: 'POST /webhooks/stripe',
       },
     },

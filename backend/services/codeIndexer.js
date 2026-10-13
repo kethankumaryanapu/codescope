@@ -1,5 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const defaultBackendDir = path.resolve(__dirname, '..');
+const defaultFrontendDir = path.resolve(defaultBackendDir, '../frontend');
 
 // In-Memory Repository Registry & Indexed Codebase Chunks
 let repositories = [
@@ -8,36 +14,45 @@ let repositories = [
     name: 'codescope-backend',
     branch: 'main',
     status: 'Connected',
-    repoPath: path.resolve(process.cwd(), '../backend'),
+    repoPath: defaultBackendDir,
     filesCount: 12,
     functionsCount: 38,
     classesCount: 8,
     coverage: '91%',
     lastIndexed: new Date().toISOString(),
+    pythonIndexed: false,
+    pythonIndexedAt: null,
+    pythonChunksStored: 0,
   },
   {
     id: 'repo-2',
     name: 'codescope-frontend',
     branch: 'main',
     status: 'Connected',
-    repoPath: path.resolve(process.cwd(), '../frontend'),
+    repoPath: defaultFrontendDir,
     filesCount: 18,
     functionsCount: 46,
     classesCount: 12,
     coverage: '88%',
     lastIndexed: new Date().toISOString(),
+    pythonIndexed: false,
+    pythonIndexedAt: null,
+    pythonChunksStored: 0,
   },
   {
     id: 'repo-3',
     name: 'payment-gateway',
     branch: 'feat/stripe-v2',
     status: 'Connected',
-    repoPath: path.resolve(process.cwd(), '../backend'),
+    repoPath: defaultBackendDir,
     filesCount: 19,
     functionsCount: 52,
     classesCount: 14,
     coverage: '94%',
     lastIndexed: new Date().toISOString(),
+    pythonIndexed: false,
+    pythonIndexedAt: null,
+    pythonChunksStored: 0,
   },
 ];
 
@@ -180,12 +195,69 @@ export const indexRepository = (repoIdOrName) => {
   };
 };
 
+// ── Path Validation & Traversal Protection ────────────────────────────────────
+
+/**
+ * Validates that a file path is strictly relative and stays inside the repository root.
+ * Blocks directory traversal sequences (..), Windows drive prefixes, null bytes,
+ * and absolute root paths.
+ * 
+ * @param {string} filePath
+ * @returns {{ valid: boolean, cleanPath?: string, error?: string }}
+ */
+export const validateRelativeFilePath = (filePath) => {
+  if (!filePath || typeof filePath !== 'string') {
+    return { valid: false, error: 'File path must be a non-empty string.' };
+  }
+
+  const trimmed = filePath.trim();
+  if (!trimmed) {
+    return { valid: false, error: 'File path cannot be empty.' };
+  }
+
+  if (trimmed.includes('\0')) {
+    return { valid: false, error: 'Invalid path: null byte detected.' };
+  }
+
+  // Block Windows drive letters (e.g. C:, D:)
+  if (/^[a-zA-Z]:/.test(trimmed)) {
+    return { valid: false, error: 'Absolute drive paths are not permitted in repository index.' };
+  }
+
+  // Normalize backslashes to forward slashes
+  const normalized = trimmed.replace(/\\/g, '/');
+
+  // Block leading slash (POSIX absolute root paths like /etc/passwd)
+  if (normalized.startsWith('/')) {
+    return { valid: false, error: 'Absolute paths are not permitted. Provide a relative path within repository root.' };
+  }
+
+  // Check individual segments for traversal tokens
+  const segments = normalized.split('/');
+  for (const seg of segments) {
+    if (seg === '..') {
+      return { valid: false, error: 'Directory traversal sequence ("..") is not permitted.' };
+    }
+  }
+
+  // Check normalized path boundary
+  const normPath = path.normalize(normalized).replace(/\\/g, '/');
+  if (normPath.startsWith('../') || normPath === '..' || path.isAbsolute(normPath)) {
+    return { valid: false, error: 'Path attempts to escape repository workspace root.' };
+  }
+
+  return { valid: true, cleanPath: normalized.replace(/^\.\//, '') };
+};
+
 // Explicit File Management APIs
 export const addExplicitFile = (repoId = 'repo-1', fileData) => {
-  const { filePath, content = '', module } = fileData;
-  if (!filePath) throw new Error('File path relative to root is required.');
+  const { filePath, content = '', module } = fileData || {};
+  const pathCheck = validateRelativeFilePath(filePath);
+  if (!pathCheck.valid) {
+    throw new Error(pathCheck.error || 'Invalid file path.');
+  }
 
-  const normalizedPath = filePath.replace(/\\/g, '/').replace(/^\/+/, '');
+  const normalizedPath = pathCheck.cleanPath;
   const deletedSet = getDeletedSet(repoId);
   deletedSet.delete(normalizedPath);
 
@@ -207,8 +279,13 @@ export const batchAddExplicitFiles = (repoId = 'repo-1', filesList = []) => {
   const newlyParsed = [];
 
   for (const item of filesList) {
-    if (!item.filePath) continue;
-    const normalizedPath = item.filePath.replace(/\\/g, '/').replace(/^\/+/, '');
+    if (!item?.filePath) continue;
+    const pathCheck = validateRelativeFilePath(item.filePath);
+    if (!pathCheck.valid) {
+      throw new Error(`File '${item.filePath}': ${pathCheck.error}`);
+    }
+
+    const normalizedPath = pathCheck.cleanPath;
     deletedSet.delete(normalizedPath);
 
     const parsed = parseCodeMetadata(normalizedPath, item.content || '');
@@ -227,6 +304,15 @@ export const batchAddExplicitFiles = (repoId = 'repo-1', filesList = []) => {
 
 export const removeExplicitFile = (repoId = 'repo-1', fileIdentifier) => {
   if (!fileIdentifier) return { success: false };
+
+  // If identifier looks like a file path rather than an ID (contains slashes or extensions), validate it
+  if (String(fileIdentifier).includes('/') || String(fileIdentifier).includes('\\')) {
+    const pathCheck = validateRelativeFilePath(String(fileIdentifier));
+    if (!pathCheck.valid) {
+      return { success: false, error: pathCheck.error };
+    }
+  }
+
   const normalizedId = fileIdentifier.toString().replace(/\\/g, '/').replace(/^\/+/, '');
   const deletedSet = getDeletedSet(repoId);
   deletedSet.add(normalizedId);
@@ -493,4 +579,100 @@ export const getIndexedFilesForRepo = (repoId) => {
   const files = indexedFilesMap.get(repoId) || [];
   return files.map((f) => f.filePath);
 };
+
+/**
+ * Validate and resolve repository filesystem path from known repository registry.
+ * Strictly checks registered repos and verifies filesystem existence without accepting
+ * arbitrary client-supplied paths.
+ * 
+ * @param {string} repoIdOrName - Repository ID or name
+ * @returns {{valid: boolean, repo?: object, path?: string, error?: string}}
+ */
+export const resolveValidatedRepoPath = (repoIdOrName) => {
+  const repo = getRepositoryByNameOrId(repoIdOrName) || getRepositoryById(repoIdOrName);
+  if (!repo) {
+    return {
+      valid: false,
+      error: `Repository '${repoIdOrName}' not found in registered repository catalog`,
+    };
+  }
+
+  let targetDir = repo.repoPath;
+  if (!targetDir || !fs.existsSync(targetDir)) {
+    if (repo.id === 'repo-2' || (repo.name && repo.name.includes('frontend'))) {
+      targetDir = defaultFrontendDir;
+    } else {
+      targetDir = defaultBackendDir;
+    }
+  }
+
+  if (!fs.existsSync(targetDir)) {
+    return {
+      valid: false,
+      repo,
+      error: `Repository path '${targetDir}' does not exist on filesystem`,
+    };
+  }
+
+  try {
+    const stat = fs.statSync(targetDir);
+    if (!stat.isDirectory()) {
+      return {
+        valid: false,
+        repo,
+        error: `Repository path '${targetDir}' is not a directory`,
+      };
+    }
+  } catch (err) {
+    return {
+      valid: false,
+      repo,
+      error: `Failed to inspect repository path '${targetDir}': ${err.message}`,
+    };
+  }
+
+  return {
+    valid: true,
+    repo,
+    path: path.resolve(targetDir),
+  };
+};
+
+/**
+ * Update Python indexing metadata on a repository record.
+ * 
+ * @param {string} repoId - Repository ID
+ * @param {object} indexInfo - Indexing result from Python service
+ */
+export const updateRepoPythonIndexStatus = (repoId, indexInfo = {}) => {
+  const repo = repositories.find((r) => r.id === repoId) || repositories[0];
+  if (!repo) return null;
+
+  if (indexInfo.success) {
+    repo.pythonIndexed = true;
+    repo.pythonIndexedAt = indexInfo.indexedAt || new Date().toISOString();
+    repo.pythonChunksStored = indexInfo.chunksStored || 0;
+    repo.pythonCollectionName = indexInfo.collectionName || 'code_chunks';
+  } else {
+    // Retain previous success state unless explicitly reset
+    if (indexInfo.reset) {
+      repo.pythonIndexed = false;
+      repo.pythonIndexedAt = null;
+      repo.pythonChunksStored = 0;
+    }
+  }
+  return repo;
+};
+
+/**
+ * Check if repository is already indexed by Python ChromaDB pipeline in this session.
+ * 
+ * @param {string} repoId - Repository ID
+ * @returns {boolean}
+ */
+export const isRepoAlreadyIndexed = (repoId) => {
+  const repo = repositories.find((r) => r.id === repoId);
+  return Boolean(repo && repo.pythonIndexed && repo.pythonChunksStored > 0);
+};
+
 

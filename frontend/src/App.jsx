@@ -6,7 +6,7 @@ function App() {
   return (
     <AuthProvider>
       <AnalysisProvider>
-        <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+        <div style={{ background: "transparent", minHeight: "100vh" }}>
           <AppRoutes />
         </div>
       </AnalysisProvider>
